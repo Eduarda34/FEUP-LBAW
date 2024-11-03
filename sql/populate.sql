@@ -47,18 +47,6 @@ INSERT INTO user_favorites (user_id, post_id) VALUES
     (1, 1),
     (2, 3);
 
-INSERT INTO follow_notification (user_id, follower_id, viewed, time) VALUES 
-    (1, 2, FALSE, NOW()),
-    (3, 1, FALSE, NOW());
-
-INSERT INTO vote_notification (user_id, post_id, comment_id, viewed, time) VALUES 
-    (1, 1, NULL, FALSE, NOW()),
-    (2, NULL, 1, FALSE, NOW());
-
-INSERT INTO comment_notification (user_id, post_id, parent_comment_id, comment_id, viewed, time) VALUES 
-    (1, 1, NULL, 1, FALSE, NOW()), 
-    (2, 2, NULL, 2, FALSE, NOW()); 
-
 INSERT INTO user_report (reporter_id, reported_id, reason, time) VALUES 
     (1, 2, 'Inappropriate behavior', NOW()),
     (3, 1, 'Spam content', NOW());

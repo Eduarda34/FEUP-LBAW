@@ -738,5 +738,14 @@ WHERE notification_id = $notification_id AND user_id = $user_id;
 
 END TRANSACTION;
 
+    -- Delete User
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+DELETE FROM users WHERE user_id = $user_id;
+
+END TRANSACTION;
+
 
 -- DROP DATABASE IF EXISTS newsnet_db;

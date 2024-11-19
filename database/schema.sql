@@ -1,5 +1,63 @@
--- CREATE DATABASE newsnet_db;
+--
+-- Use a specific schema and set it as default - thingy.
+--
+/*DROP SCHEMA IF EXISTS thingy CASCADE;
+CREATE SCHEMA IF NOT EXISTS thingy;
+SET search_path TO thingy;
 
+--
+-- Drop any existing tables.
+--
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS cards CASCADE;
+DROP TABLE IF EXISTS items CASCADE;
+
+--
+-- Create tables.
+--
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  email VARCHAR UNIQUE NOT NULL,
+  password VARCHAR NOT NULL,
+  remember_token VARCHAR
+);
+
+CREATE TABLE cards (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  user_id INTEGER REFERENCES users NOT NULL
+);
+
+CREATE TABLE items (
+  id SERIAL PRIMARY KEY,
+  card_id INTEGER NOT NULL REFERENCES cards ON DELETE CASCADE,
+  description VARCHAR NOT NULL,
+  done BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+--
+-- Insert value.
+--
+
+INSERT INTO users VALUES (
+  DEFAULT,
+  'John Doe',
+  'admin@example.com',
+  '$2y$10$HfzIhGCCaxqyaIdGgjARSuOKAcm1Uy82YfLuNaajn6JrjLWy9Sj/W'
+); -- Password is 1234. Generated using Hash::make('1234')
+
+INSERT INTO cards VALUES (DEFAULT, 'Things to do', 1);
+INSERT INTO items VALUES (DEFAULT, 1, 'Buy milk');
+INSERT INTO items VALUES (DEFAULT, 1, 'Walk the dog', true);
+
+INSERT INTO cards VALUES (DEFAULT, 'Things not to do', 1);
+INSERT INTO items VALUES (DEFAULT, 2, 'Break a leg');
+INSERT INTO items VALUES (DEFAULT, 2, 'Crash the car');
+*/
+
+-- CREATE DATABASE newsnet_db;
+DROP SCHEMA IF EXISTS lbaw2484 CASCADE;
 CREATE SCHEMA IF NOT EXISTS lbaw2484;
 SET search_path TO lbaw2484;
 
@@ -25,6 +83,7 @@ DROP TABLE IF EXISTS follows CASCADE;
 DROP TABLE IF EXISTS system_managers CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
+/*
 DROP INDEX IF EXISTS index_posts_user_id;
 DROP INDEX IF EXISTS index_comments_post_id;
 DROP INDEX IF EXISTS index_posts_created_time;
@@ -64,6 +123,7 @@ DROP TRIGGER IF EXISTS no_self_report_post_trigger ON post_report CASCADE;
 DROP FUNCTION IF EXISTS no_self_report_post CASCADE;
 DROP TRIGGER IF EXISTS no_self_report_comment_trigger ON comment_report CASCADE;
 DROP FUNCTION IF EXISTS no_self_report_comment CASCADE;
+*/
 
 -- Users table
 CREATE TABLE users (
@@ -237,6 +297,7 @@ CREATE TABLE blocked_users (
 );
 
 
+/*
 -- Indexes
 
 CREATE INDEX index_posts_user_id ON posts USING hash(user_id);
@@ -483,7 +544,7 @@ CREATE FUNCTION check_comment_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF NEW.created_time < (SELECT created_time FROM posts WHERE post_id = NEW.post_id) THEN
+        IF NEW.created_time <= (SELECT created_time FROM posts WHERE post_id = NEW.post_id) THEN
             RAISE EXCEPTION 'Comment date must be after the article date';
         END IF;
         RETURN NEW;
@@ -501,7 +562,7 @@ CREATE FUNCTION check_reply_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF (SELECT created_time FROM comments WHERE comment_id = NEW.comment_id) < (SELECT created_time FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
+        IF (SELECT created_time FROM comments WHERE comment_id = NEW.comment_id) <= (SELECT created_time FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
             RAISE EXCEPTION 'Reply date must be after the parent comment date';
         END IF;
         RETURN NEW;
@@ -548,7 +609,7 @@ LANGUAGE plpgsql;
 CREATE TRIGGER no_self_vote_comment_trigger
 BEFORE INSERT OR UPDATE ON comment_votes
 FOR EACH ROW EXECUTE PROCEDURE no_self_vote_comment();
-
+  
 
 -- BR06: A user is unable to report themselves or their own content.
     -- Posts
@@ -585,4 +646,168 @@ CREATE TRIGGER no_self_report_comment_trigger
 BEFORE INSERT OR UPDATE ON comment_report
 FOR EACH ROW EXECUTE PROCEDURE no_self_report_comment();
 
+
+-- Transactions
+
+    -- Create Post
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+INSERT INTO posts (user_id, title, body, created_time)
+VALUES ($user_id, $title, $body, NOW());
+
+INSERT INTO post_categories (post_id, category_id)
+VALUES (currval('posts_post_id_seq'), $category_id);
+
+END TRANSACTION;
+
+    -- Get User Follow Notifications
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+SELECT * FROM follow_notification
+WHERE user_id = $user_id
+ORDER BY created_time DESC;
+
+END TRANSACTION;
+
+    -- Get User Vote Notifications
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+SELECT * FROM vote_notification
+WHERE user_id = $user_id
+ORDER BY created_time DESC;
+
+END TRANSACTION;
+
+    -- Get User Comment Notifications
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+SELECT * FROM comment_notification
+WHERE user_id = $user_id
+ORDER BY created_time DESC;
+
+END TRANSACTION;
+
+    -- Get User Post Notifications
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+SELECT * FROM post_notification
+WHERE user_id = $user_id
+ORDER BY created_time DESC;
+
+END TRANSACTION;
+
+    -- Get Post Comments
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+SELECT *
+FROM comments 
+WHERE post_id = $post_id 
+ORDER BY created_time ASC;
+
+END TRANSACTION;
+
+    -- Create Reply
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+INSERT INTO comments (post_id, user_id, body, created_time)
+VALUES ($post_id, $user_id, $body, NOW());
+
+INSERT INTO replies (parent_comment_id, comment_id)
+VALUES ($parent_comment_id, currval('comments_comment_id_seq'));
+
+END TRANSACTION;
+
+    -- Get Comment Replies
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+SELECT *
+FROM replies 
+WHERE parent_comment_id = $parent_comment_id 
+ORDER BY created_time ASC;
+
+END TRANSACTION;
+
+    -- Create Vote On Post
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+INSERT INTO post_votes (user_id, post_id, is_like, time)
+VALUES ($user_id, $post_id, $is_like, NOW())
+ON CONFLICT (user_id, post_id)
+DO UPDATE SET is_like = EXCLUDED.is_like, time = NOW();
+
+END TRANSACTION;
+
+    -- Mark Follow Notification As Viewed
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+UPDATE follow_notification
+SET viewed = TRUE
+WHERE notification_id = $notification_id AND user_id = $user_id;
+
+END TRANSACTION;
+
+    -- Mark Vote Notification As Viewed
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+UPDATE vote_notification
+SET viewed = TRUE
+WHERE notification_id = $notification_id AND user_id = $user_id;
+
+END TRANSACTION;
+
+    -- Mark Comment Notification As Viewed
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+UPDATE comment_notification
+SET viewed = TRUE
+WHERE notification_id = $notification_id AND user_id = $user_id;
+
+END TRANSACTION;
+
+    -- Mark Post Notification As Viewed
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+UPDATE post_notification
+SET viewed = TRUE
+WHERE notification_id = $notification_id AND user_id = $user_id;
+
+END TRANSACTION;
+
+    -- Delete User
+BEGIN TRANSACTION;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
+
+DELETE FROM users WHERE user_id = $user_id;
+
+END TRANSACTION;
+
+
 -- DROP DATABASE IF EXISTS newsnet_db;
+*/

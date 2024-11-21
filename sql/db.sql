@@ -1,5 +1,5 @@
 -- CREATE DATABASE newsnet_db;
-
+DROP SCHEMA IF EXISTS lbaw2484 CASCADE;
 CREATE SCHEMA IF NOT EXISTS lbaw2484;
 SET search_path TO lbaw2484;
 
@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS follows CASCADE;
 DROP TABLE IF EXISTS system_managers CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+
 
 DROP INDEX IF EXISTS index_posts_user_id;
 DROP INDEX IF EXISTS index_comments_post_id;
@@ -65,9 +66,10 @@ DROP FUNCTION IF EXISTS no_self_report_post CASCADE;
 DROP TRIGGER IF EXISTS no_self_report_comment_trigger ON comment_report CASCADE;
 DROP FUNCTION IF EXISTS no_self_report_comment CASCADE;
 
+
 -- Users table
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -77,13 +79,13 @@ CREATE TABLE users (
 
 -- System Managers table
 CREATE TABLE system_managers (
-    sm_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE
+    sm_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Follows table (for following users)
 CREATE TABLE follows (
-    follower_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    followed_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    follower_id INT REFERENCES users(id) ON DELETE CASCADE,
+    followed_id INT REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (follower_id, followed_id),
     CONSTRAINT no_self_follow CHECK (follower_id <> followed_id) -- BR07
 );
@@ -96,7 +98,7 @@ CREATE TABLE categories (
 
 -- User follows categories
 CREATE TABLE user_category (
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     category_id INT REFERENCES categories(category_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, category_id)
 );
@@ -104,7 +106,7 @@ CREATE TABLE user_category (
 -- Posts table
 CREATE TABLE posts (
     post_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
     created_time TIMESTAMP DEFAULT NOW(),
@@ -123,7 +125,7 @@ CREATE TABLE post_categories (
 CREATE TABLE comments (
     comment_id SERIAL PRIMARY KEY,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     body TEXT NOT NULL,
     created_time TIMESTAMP DEFAULT NOW(),
     updated_time TIMESTAMP,
@@ -141,7 +143,7 @@ CREATE TABLE replies (
 -- votes table for voting on posts 
 CREATE TABLE post_votes (
     vote_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     is_like BOOLEAN NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
@@ -151,7 +153,7 @@ CREATE TABLE post_votes (
 -- votes table for voting on comments
 CREATE TABLE comment_votes (
     vote_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
     is_like BOOLEAN NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
@@ -160,7 +162,7 @@ CREATE TABLE comment_votes (
 
 -- User favorites table
 CREATE TABLE user_favorites (
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, post_id)
 );
@@ -168,15 +170,15 @@ CREATE TABLE user_favorites (
 -- Notifications tables
 CREATE TABLE follow_notification(
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    follower_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    follower_id INT REFERENCES users(id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
     time TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE vote_notification (
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
@@ -185,7 +187,7 @@ CREATE TABLE vote_notification (
 
 CREATE TABLE comment_notification (
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     parent_comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
@@ -195,8 +197,8 @@ CREATE TABLE comment_notification (
 
 CREATE TABLE post_notification (
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    author_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    author_id INT REFERENCES users(id) ON DELETE SET NULL,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
     time TIMESTAMP DEFAULT NOW()
@@ -205,8 +207,8 @@ CREATE TABLE post_notification (
 -- Reports tables
 CREATE TABLE user_report (
     report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    reported_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
+    reported_id INT REFERENCES users(id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
     CONSTRAINT no_self_report_user CHECK (reporter_id <> reported_id)
@@ -214,7 +216,7 @@ CREATE TABLE user_report (
 
 CREATE TABLE post_report (
     report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW()
@@ -222,7 +224,7 @@ CREATE TABLE post_report (
 
 CREATE TABLE comment_report (
     report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW()
@@ -230,11 +232,12 @@ CREATE TABLE comment_report (
 
 -- Blocked Users table with reason and reference to report leading to block
 CREATE TABLE blocked_users (
-    blocked_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    blocked_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     blocked_at TIMESTAMP DEFAULT NOW(),
     reason TEXT,
     report_id INT REFERENCES user_report(report_id) ON DELETE SET NULL
 );
+
 
 
 -- Indexes
@@ -444,21 +447,21 @@ $BODY$
             IF NEW.is_like THEN
                 UPDATE users
                 SET reputation = reputation + 1
-                WHERE user_id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
             ELSE
                 UPDATE users
                 SET reputation = reputation - 1
-                WHERE user_id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
             END IF;
         ELSIF TG_TABLE_NAME = 'comment_votes' THEN
             IF NEW.is_like THEN
                 UPDATE users
                 SET reputation = reputation + 1
-                WHERE user_id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
             ELSE
                 UPDATE users
                 SET reputation = reputation - 1
-                WHERE user_id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
             END IF;
         END IF;
         RETURN NEW;
@@ -483,7 +486,7 @@ CREATE FUNCTION check_comment_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF NEW.created_time < (SELECT created_time FROM posts WHERE post_id = NEW.post_id) THEN
+        IF NEW.created_time <= (SELECT created_time FROM posts WHERE post_id = NEW.post_id) THEN
             RAISE EXCEPTION 'Comment date must be after the article date';
         END IF;
         RETURN NEW;
@@ -501,7 +504,7 @@ CREATE FUNCTION check_reply_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF (SELECT created_time FROM comments WHERE comment_id = NEW.comment_id) < (SELECT created_time FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
+        IF (SELECT created_time FROM comments WHERE comment_id = NEW.comment_id) <= (SELECT created_time FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
             RAISE EXCEPTION 'Reply date must be after the parent comment date';
         END IF;
         RETURN NEW;
@@ -548,7 +551,7 @@ LANGUAGE plpgsql;
 CREATE TRIGGER no_self_vote_comment_trigger
 BEFORE INSERT OR UPDATE ON comment_votes
 FOR EACH ROW EXECUTE PROCEDURE no_self_vote_comment();
-
+  
 
 -- BR06: A user is unable to report themselves or their own content.
     -- Posts

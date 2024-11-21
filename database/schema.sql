@@ -1,61 +1,3 @@
---
--- Use a specific schema and set it as default - thingy.
---
-/*DROP SCHEMA IF EXISTS thingy CASCADE;
-CREATE SCHEMA IF NOT EXISTS thingy;
-SET search_path TO thingy;
-
---
--- Drop any existing tables.
---
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS cards CASCADE;
-DROP TABLE IF EXISTS items CASCADE;
-
---
--- Create tables.
---
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  email VARCHAR UNIQUE NOT NULL,
-  password VARCHAR NOT NULL,
-  remember_token VARCHAR
-);
-
-CREATE TABLE cards (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  user_id INTEGER REFERENCES users NOT NULL
-);
-
-CREATE TABLE items (
-  id SERIAL PRIMARY KEY,
-  card_id INTEGER NOT NULL REFERENCES cards ON DELETE CASCADE,
-  description VARCHAR NOT NULL,
-  done BOOLEAN NOT NULL DEFAULT FALSE
-);
-
---
--- Insert value.
---
-
-INSERT INTO users VALUES (
-  DEFAULT,
-  'John Doe',
-  'admin@example.com',
-  '$2y$10$HfzIhGCCaxqyaIdGgjARSuOKAcm1Uy82YfLuNaajn6JrjLWy9Sj/W'
-); -- Password is 1234. Generated using Hash::make('1234')
-
-INSERT INTO cards VALUES (DEFAULT, 'Things to do', 1);
-INSERT INTO items VALUES (DEFAULT, 1, 'Buy milk');
-INSERT INTO items VALUES (DEFAULT, 1, 'Walk the dog', true);
-
-INSERT INTO cards VALUES (DEFAULT, 'Things not to do', 1);
-INSERT INTO items VALUES (DEFAULT, 2, 'Break a leg');
-INSERT INTO items VALUES (DEFAULT, 2, 'Crash the car');
-*/
-
 -- CREATE DATABASE newsnet_db;
 DROP SCHEMA IF EXISTS lbaw2484 CASCADE;
 CREATE SCHEMA IF NOT EXISTS lbaw2484;
@@ -83,7 +25,7 @@ DROP TABLE IF EXISTS follows CASCADE;
 DROP TABLE IF EXISTS system_managers CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
-/*
+
 DROP INDEX IF EXISTS index_posts_user_id;
 DROP INDEX IF EXISTS index_comments_post_id;
 DROP INDEX IF EXISTS index_posts_created_time;
@@ -123,11 +65,11 @@ DROP TRIGGER IF EXISTS no_self_report_post_trigger ON post_report CASCADE;
 DROP FUNCTION IF EXISTS no_self_report_post CASCADE;
 DROP TRIGGER IF EXISTS no_self_report_comment_trigger ON comment_report CASCADE;
 DROP FUNCTION IF EXISTS no_self_report_comment CASCADE;
-*/
+
 
 -- Users table
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -137,13 +79,13 @@ CREATE TABLE users (
 
 -- System Managers table
 CREATE TABLE system_managers (
-    sm_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE
+    sm_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Follows table (for following users)
 CREATE TABLE follows (
-    follower_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    followed_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    follower_id INT REFERENCES users(id) ON DELETE CASCADE,
+    followed_id INT REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (follower_id, followed_id),
     CONSTRAINT no_self_follow CHECK (follower_id <> followed_id) -- BR07
 );
@@ -156,7 +98,7 @@ CREATE TABLE categories (
 
 -- User follows categories
 CREATE TABLE user_category (
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     category_id INT REFERENCES categories(category_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, category_id)
 );
@@ -164,7 +106,7 @@ CREATE TABLE user_category (
 -- Posts table
 CREATE TABLE posts (
     post_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
     created_time TIMESTAMP DEFAULT NOW(),
@@ -183,7 +125,7 @@ CREATE TABLE post_categories (
 CREATE TABLE comments (
     comment_id SERIAL PRIMARY KEY,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     body TEXT NOT NULL,
     created_time TIMESTAMP DEFAULT NOW(),
     updated_time TIMESTAMP,
@@ -201,7 +143,7 @@ CREATE TABLE replies (
 -- votes table for voting on posts 
 CREATE TABLE post_votes (
     vote_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     is_like BOOLEAN NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
@@ -211,7 +153,7 @@ CREATE TABLE post_votes (
 -- votes table for voting on comments
 CREATE TABLE comment_votes (
     vote_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
     comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
     is_like BOOLEAN NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
@@ -220,7 +162,7 @@ CREATE TABLE comment_votes (
 
 -- User favorites table
 CREATE TABLE user_favorites (
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, post_id)
 );
@@ -228,15 +170,15 @@ CREATE TABLE user_favorites (
 -- Notifications tables
 CREATE TABLE follow_notification(
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    follower_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    follower_id INT REFERENCES users(id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
     time TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE vote_notification (
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
@@ -245,7 +187,7 @@ CREATE TABLE vote_notification (
 
 CREATE TABLE comment_notification (
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     parent_comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
@@ -255,8 +197,8 @@ CREATE TABLE comment_notification (
 
 CREATE TABLE post_notification (
     notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    author_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    author_id INT REFERENCES users(id) ON DELETE SET NULL,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
     time TIMESTAMP DEFAULT NOW()
@@ -265,8 +207,8 @@ CREATE TABLE post_notification (
 -- Reports tables
 CREATE TABLE user_report (
     report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    reported_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
+    reported_id INT REFERENCES users(id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
     CONSTRAINT no_self_report_user CHECK (reporter_id <> reported_id)
@@ -274,7 +216,7 @@ CREATE TABLE user_report (
 
 CREATE TABLE post_report (
     report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW()
@@ -282,7 +224,7 @@ CREATE TABLE post_report (
 
 CREATE TABLE comment_report (
     report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW()
@@ -290,14 +232,14 @@ CREATE TABLE comment_report (
 
 -- Blocked Users table with reason and reference to report leading to block
 CREATE TABLE blocked_users (
-    blocked_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    blocked_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     blocked_at TIMESTAMP DEFAULT NOW(),
     reason TEXT,
     report_id INT REFERENCES user_report(report_id) ON DELETE SET NULL
 );
 
 
-/*
+
 -- Indexes
 
 CREATE INDEX index_posts_user_id ON posts USING hash(user_id);
@@ -505,21 +447,21 @@ $BODY$
             IF NEW.is_like THEN
                 UPDATE users
                 SET reputation = reputation + 1
-                WHERE user_id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
             ELSE
                 UPDATE users
                 SET reputation = reputation - 1
-                WHERE user_id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
             END IF;
         ELSIF TG_TABLE_NAME = 'comment_votes' THEN
             IF NEW.is_like THEN
                 UPDATE users
                 SET reputation = reputation + 1
-                WHERE user_id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
             ELSE
                 UPDATE users
                 SET reputation = reputation - 1
-                WHERE user_id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
             END IF;
         END IF;
         RETURN NEW;
@@ -647,7 +589,7 @@ BEFORE INSERT OR UPDATE ON comment_report
 FOR EACH ROW EXECUTE PROCEDURE no_self_report_comment();
 
 
--- Transactions
+/* -- Transactions
 
     -- Create Post
 BEGIN TRANSACTION;
@@ -804,10 +746,74 @@ BEGIN TRANSACTION;
 
 SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
-DELETE FROM users WHERE user_id = $user_id;
+DELETE FROM users WHERE id = $id;
 
-END TRANSACTION;
+END TRANSACTION; */
 
 
 -- DROP DATABASE IF EXISTS newsnet_db;
-*/
+
+
+-- Populate
+
+INSERT INTO users (username, email, password, reputation, created_time) VALUES 
+    ('johndoe', 'johndoe@example.com', 'password123', 10, NOW()),
+    ('janedoe', 'janedoe@example.com', 'password456', 20, NOW()),
+    ('alice', 'alice@example.com', 'password789', 5, NOW()),
+    ('Cristiano', 'cristiano_cr7_ronaldo@goat.pt', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 0, NOW());
+
+INSERT INTO system_managers (sm_id) VALUES (1);
+
+INSERT INTO categories (name) VALUES 
+    ('Technology'),
+    ('Science'),
+    ('Health'),
+    ('Entertainment');
+
+INSERT INTO user_category (user_id, category_id) VALUES 
+    (1, 1),
+    (2, 2),
+    (3, 3);
+
+INSERT INTO posts (user_id, title, body, created_time) VALUES 
+    (1, 'Latest in AI Technology', 'This article explores the latest advancements in AI...', '2024-11-21 18:31:35.42877'),
+    (2, 'Breakthroughs in Quantum Computing', 'Quantum computing is advancing at a rapid pace...', '2024-11-21 18:31:35.42877'),
+    (4, 'Health Benefits of a Balanced Diet', 'A balanced diet is crucial for maintaining health...', '2024-11-21 18:31:35.42877');
+
+INSERT INTO post_categories (post_id, category_id) VALUES 
+    (1, 1),
+    (2, 2),
+    (3, 3);
+
+INSERT INTO comments (post_id, user_id, body, created_time) VALUES 
+    (1, 2, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),
+    (1, 3, 'Quantum computing has so much potential!', '2024-11-21 19:32:35.42877'),
+    (3, 1, 'Very informative, thanks!', '2024-11-21 19:31:35.42877');
+
+INSERT INTO replies (parent_comment_id, comment_id) VALUES 
+    (1, 2);
+    
+INSERT INTO post_votes (user_id, post_id, is_like, time) VALUES 
+    (2, 1, TRUE, NOW()),
+    (3, 2, FALSE, NOW());
+
+INSERT INTO comment_votes (user_id, comment_id, is_like, time) VALUES 
+    (1, 1, TRUE, NOW()),
+    (2, 2, TRUE, NOW());
+
+INSERT INTO user_favorites (user_id, post_id) VALUES 
+    (1, 1),
+    (2, 3);
+
+INSERT INTO user_report (reporter_id, reported_id, reason, time) VALUES 
+    (1, 2, 'Inappropriate behavior', NOW()),
+    (3, 1, 'Spam content', NOW());
+
+INSERT INTO post_report (reporter_id, post_id, reason, time) VALUES 
+    (2, 1, 'Inaccurate information', NOW());
+
+INSERT INTO comment_report (reporter_id, comment_id, reason, time) VALUES 
+    (1, 2, 'Offensive comment', NOW());
+
+INSERT INTO blocked_users (blocked_id, blocked_at, reason, report_id) VALUES 
+    (2, NOW(), 'Repeated violations', 1);

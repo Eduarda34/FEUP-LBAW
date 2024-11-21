@@ -24,7 +24,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
     ];
@@ -50,10 +50,44 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the cards for a user.
+     * Get the posts for a user.
      */
-    public function cards(): HasMany
-    {
-        return $this->hasMany(Card::class);
+    public function posts(): HasMany {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Get the comments for a user.
+     */
+    public function comments(): HasMany {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Get the followed users for a user.
+     */
+    public function following(): BelongsToMany {
+        return $this->belongsToMany(User::class, 'follows', 'id_follower', 'id_followed');
+    }
+
+    /**
+     * Get the follower users for a user.
+     */
+    public function followers(): BelongsToMany {
+        return $this->belongsToMany(User::class, 'follows', 'id_followed', 'id_follower');
+    }
+
+    /**
+     * Get the favorite posts for a user.
+     */
+    public function favorites(): BelongsToMany {
+        return $this->belongsToMany(Post::class, 'user_favorites', 'user_id', 'post_id');
+    }
+
+    /**
+     * Get the followed categories for a user.
+     */
+    public function followed_categories(): BelongsToMany {
+        return $this->belongsToMany(Category::class, 'user_category', 'user_id', 'category_id');
     }
 }

@@ -1,0 +1,1401 @@
+openapi: 3.0.0
+
+info:
+  version: '1.0'
+  title: 'NewsNet API'
+  description: 'Web Resources Specification (A7) for NewsNet'
+
+servers:
+  - url: http://lbaw.fe.up.pt
+    description: Production server
+
+tags:
+  - name: 'M01: Authentication'
+  - name: 'M02: Users'
+  - name: 'M03: News Posts'
+  - name: 'M04: Comments'
+  - name: 'M05: Search'
+  - name: 'M06: System Management'
+  - name: 'M07: Notifications'
+
+paths:
+  ####################################################### M01: Authentication #######################################################
+  /register:
+    get:
+     operationId: R101
+     summary: 'R101: Register Form'
+     description: 'Provide new user registration form. Access: PUB'
+     tags:
+       - 'M01: Authentication and Individual Profile'
+     responses:
+       '200':
+         description: 'Ok. Show Sign-Up UI'
+    post:
+      operationId: R102
+      summary: 'R102: Register a new user'
+      description: 'Creates a new user account. Access: PUB'
+      tags:
+        - 'M01: Authentication'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - email
+                - password
+      responses:
+       '302':
+         description: 'Redirect after processing the new user information.'
+         headers:
+           Location:
+             schema:
+               type: string
+             examples:
+               302Success:
+                 description: 'Successful registration. Redirect to user profile.'
+                 value: '/users/{id}'
+               302Failure:
+                 description: 'Failed registration. Redirect to login form.'
+                 value: '/register'
+
+  /login:
+    get:
+      operationId: R103
+      summary: 'R103: Login Form'
+      description: 'Provide login form. Access: PUB'
+      tags:
+        - 'M01: Authentication and Individual Profile'
+      responses:
+        '200':
+          description: 'Ok. Show Log-in UI'
+    post:
+      operationId: R104
+      summary: 'R104: User login'
+      description: 'Authenticates a user. Access: PUB'
+      tags:
+        - 'M01: Authentication'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '302':
+          description: 'Redirect after processing the login credentials.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful authentication. Redirect to user profile.'
+                  value: '/users/{id}'
+                302Error:
+                  description: 'Failed authentication. Redirect to login form.'
+                  value: '/login'
+
+  /logout:
+    post:
+      operationId: R105
+      summary: 'R105: Logout user'
+      description: 'Logs out the authenticated user. Access: USR, SM'
+      tags:
+        - 'M01: Authentication'
+      responses:
+        '302':
+          description: 'Redirect after processing logout.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful logout. Redirect to login form.'
+                  value: '/login'
+
+  /recover_password:
+    post:
+      operationId: R106
+      summary: 'R106: Recover user password'
+      description: 'Sends a password recovery email. Access: PUB'
+      tags:
+        - 'M01: Authentication'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        '200': 'Password recovery email sent.'
+        '404': 'Email not found.'
+
+  ############################################################ M02: Users ############################################################
+  /users/{id}:
+    get:
+      operationId: R201
+      summary: 'R201: Get User Profile'
+      description: 'Retrieve profile information for a specific user. Access: USR, SM'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to retrieve'
+      responses:
+        '200':
+          description: 'User profile data returned successfully.'
+
+    delete:
+      operationId: R202
+      summary: 'R202: Delete User'
+      description: 'Delete the profile of a specific user. Access: SM'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to delete'
+      responses:
+        '204':
+          description: 'User deleted successfully.'
+        '400':
+          description: 'Request is invalid or malformed.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Member not found.'
+
+  /users/{id}/edit:
+    get:
+      operationId: R203
+      summary: '203: Edit Profile Form'
+      description: 'Page that allows a member to update his information. Access: OWN, SM'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: 'ID of the user to update'
+          required: true
+      responses:
+        '200':
+          description: 'Ok. Show profile edition UI.'
+    put:
+      operationId: R204
+      summary: 'R204: Update User Profile'
+      description: 'Update the profile information for a specific user. Access: OWN, SM'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to update'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+              required:
+                - username
+                - email
+      responses:
+       '302':
+         description: 'Redirect after processing the new user information.'
+         headers:
+           Location:
+             schema:
+               type: string
+             examples:
+               302Success:
+                 description: 'Successful profile edition. Redirect to user profile.'
+                 value: '/users/{id}'
+               302Failure:
+                 description: 'Failed profile edition. Stay in edition form.'
+                 value: '/users/{id}/edit'
+
+  /users/{id}/followers:
+    get:
+      operationId: R205
+      summary: 'R205: Get Followers'
+      description: 'Retrieve the list of followers for a specific user. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to fetch followers for'
+      responses:
+        '200':
+          description: 'List of followers returned successfully.'
+
+  /users/{id}/following:
+    get:
+      operationId: R206
+      summary: 'R206: Get Following'
+      description: 'Retrieve the list of followed users by a specific user. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to fetch followers for'
+      responses:
+        '200':
+          description: 'List of following returned successfully.'
+
+  /users/{id}/follow:
+    post:
+      operationId: R207
+      summary: 'R207: Follow User'
+      description: 'Follow a specific user. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to follow'
+      responses:
+        '201':
+          description: 'User followed successfully.'
+
+  /users/{id}/unfollow:
+    delete:
+      operationId: R208
+      summary: 'R208: Unfollow User'
+      description: 'Unfollow a specific user. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to unfollow'
+      responses:
+        '204':
+          description: 'User unfollowed successfully.'
+
+  /users/categories:
+    get:
+      operationId: R209
+      summary: 'R209: Get Followed Categories'
+      description: 'Retrieve a list of categories the user follows. Access: OWN'
+      tags:
+        - 'M02: Users'
+      responses:
+        '200':
+          description: 'List of followed categories returned successfully.'
+        '403':
+          description: 'Permission denied.'
+
+  /users/categories/{category_id}:
+    post:
+      operationId: R210
+      summary: 'R210: Follow Category'
+      description: 'Follow a specific category. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the category to follow'
+      responses:
+        '201':
+          description: 'Category followed successfully.'
+        '404':
+          description: 'Category not found.'
+
+    delete:
+      operationId: R211
+      summary: 'R211: Unfollow Category'
+      description: 'Unfollow a specific category. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the category to unfollow'
+      responses:
+        '204':
+          description: 'Category unfollowed successfully.'
+        '404':
+          description: 'Category not found.'
+
+  /users/{id}/report:
+    post:
+      operationId: R212
+      summary: 'R212: Report User'
+      description: 'Report a specific user for inappropriate behavior. Access: USR'
+      tags:
+        - 'M02: Users'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to report'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+              required:
+                - reason
+      responses:
+        '201':
+          description: 'Report created successfully.'
+
+  /users/notifications:
+    get:
+      operationId: R213
+      summary: 'R213: Get Notifications'
+      description: 'Retrieve the list of notifications for the user. Access: OWN'
+      tags:
+        - 'M02: Users'
+      responses:
+        '200':
+          description: 'List of notifications returned successfully.'
+
+  ########################################################## M03: News Posts ##########################################################
+  /posts:
+    post:
+      operationId: R301
+      summary: 'R301: Create a New Post'
+      description: 'Create a new news post. Access: USR'
+      tags:
+        - 'M03: News Posts'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+              required:
+                - title
+                - body
+      responses:
+        '302':
+          description: 'Redirect after creating new post.'
+          headers:
+            Location:
+              schema:
+                type: string
+              example:
+                302Success:
+                  description: 'Successful. Post created. Redirect to post.'
+                  value: '/posts/{post_id}'
+                302Failure:
+                  description: 'Failed. Redirect back.'
+                  value: '/posts'
+
+    get:
+      operationId: R302
+      summary: 'R302: List All Posts'
+      description: 'Retrieve a list of all posts. Access: SM, USR, PUB'
+      tags:
+        - 'M03: News Posts'
+      responses:
+        '200':
+          description: 'List of posts returned successfully.'
+          content:
+
+  /posts/{post_id}:
+    get:
+      operationId: R303
+      summary: 'R303: Get Post Details'
+      description: 'Retrieve details of a specific post. Access: SM, USR, PUB'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to retrieve'
+      responses:
+        '200':
+          description: 'Post details returned successfully.'
+        '404':
+          description: 'Post not found.'
+
+    put:
+      operationId: R304
+      summary: 'R304: Edit a Post'
+      description: 'Edit the content of a specific post. Access: OWN, SM'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to edit'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+              required:
+                - title
+                - body
+      responses:
+        '200':
+          description: 'Post updated successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Post not found.'
+
+    delete:
+      operationId: R305
+      summary: 'R305: Delete a Post'
+      description: 'Delete a specific post. Access: OWN, SM'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to delete'
+      responses:
+        '204':
+          description: 'Post deleted successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Post not found.'
+
+  /posts/category/{category_id}:
+    get:
+      operationId: R306
+      summary: 'R306: List Posts by Category'
+      description: 'Retrieve a list of posts by a specific category. Access: USR, PUB'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the category to filter posts by'
+      responses:
+        '200':
+          description: 'List of posts for the category returned successfully.'
+
+  /posts/{post_id}/vote:
+    post:
+      operationId: R307
+      summary: 'R307: Vote on a Post'
+      description: 'Vote (like/dislike) on a specific post. Access: USR'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to vote on'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                is_like:
+                  type: boolean
+              required:
+                - is_like
+      responses:
+        '201':
+          description: 'Vote added successfully.'
+        '400':
+          description: 'Request is invalid or malformed.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Post not found.'
+
+    put:
+      operationId: R308
+      summary: 'R308: Edit Vote on a Post'
+      description: 'Edit an existing vote (like/dislike) on a specific post. Access: OWN'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to update vote for'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                is_like:
+                  type: boolean
+              required:
+                - is_like
+      responses:
+        '200':
+          description: 'Vote updated successfully.'
+        '400':
+          description: 'Request is invalid or malformed.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Post not found.'
+
+    delete:
+      operationId: R309
+      summary: 'R309: Remove Vote on a Post'
+      description: 'Remove an existing vote (like/dislike) from a specific post. Access: OWN'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to remove vote from'
+      responses:
+        '204':
+          description: 'Vote removed successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Post not found.'
+  
+  /posts/favorites:
+    get:
+      operationId: R310
+      summary: 'R310: Get Favorite Posts'
+      description: 'Retrieve a user list of favorite posts. Access: USR'
+      tags:
+        - 'M03: News Posts'
+      responses:
+        '200':
+          description: 'List of favorite posts returned successfully.'
+
+  /posts/{post_id}/favorites:
+    post:
+      operationId: R311
+      summary: 'R311: Add to Favorites'
+      description: 'Add a post to the user’s favorites. Access: USR'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to add'
+      responses:
+        '201':
+          description: 'Post added to favorites.'
+
+    delete:
+      operationId: R312
+      summary: 'R312: Remove from Favorites'
+      description: 'Remove a post from the user’s favorites. Access: USR'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to remove'
+      responses:
+        '204':
+          description: 'Post removed from favorites.'
+
+  /posts/{post_id}/report:
+    post:
+      operationId: R313
+      summary: 'R313: Report a Post'
+      description: 'Report a specific post for inappropriate content. Access: USR'
+      tags:
+        - 'M03: News Posts'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to report'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+              required:
+                - reason
+      responses:
+        '201':
+          description: 'Post reported successfully.'
+      
+  ########################################################## M04: Comments ##########################################################
+  /posts/{post_id}/comments:
+    post:
+      operationId: R401
+      summary: 'R201: Add a Comment to a Post'
+      description: 'Add a new comment to a specific post. Access: USR'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to comment on'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+              required:
+                - body
+      responses:
+        '201':
+          description: 'Comment added successfully.'
+
+    get:
+      operationId: R402
+      summary: 'R402: List Comments for a Post'
+      description: 'Retrieve a list of comments for a specific post. Access: USR, SM'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: post_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the post to retrieve comments for'
+      responses:
+        '200':
+          description: 'List of comments returned successfully.'
+
+  /comments/{comment_id}:
+    put:
+      operationId: R403
+      summary: 'R403: Edit a Comment'
+      description: 'Edit the content of a specific comment. Access: OWN'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to edit'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+              required:
+                - body
+      responses:
+        '200':
+          description: 'Comment updated successfully.'
+
+    delete:
+      operationId: R404
+      summary: 'R404: Delete a Comment'
+      description: 'Delete a specific comment. Access: OWN, SM'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to delete'
+      responses:
+        '204':
+          description: 'Comment deleted successfully.'
+
+  /comments/{comment_id}/reply:
+    post:
+      operationId: R405
+      summary: 'R405: Reply to a Comment'
+      description: 'Add a reply to a specific comment. Access: USR'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to reply to'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+              required:
+                - body
+      responses:
+        '201':
+          description: 'Reply added successfully.'
+
+  /comments/{comment_id}/vote:
+    post:
+      operationId: R406
+      summary: 'R406: Vote on a Comment'
+      description: 'Vote (like/dislike) on a specific comment. Access: USR'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to vote on'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                is_like:
+                  type: boolean
+              required:
+                - is_like
+      responses:
+        '201':
+          description: 'Vote added successfully.'
+        '400':
+          description: 'Request is invalid or malformed.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Comment not found.'
+
+    put:
+      operationId: R407
+      summary: 'R407: Edit a Vote on a Comment'
+      description: 'Edit an existing vote (like/dislike) on a specific comment. Access: OWN'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to update vote for'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                is_like:
+                  type: boolean
+              required:
+                - is_like
+      responses:
+        '200':
+          description: 'Vote updated successfully.'
+        '400':
+          description: 'Request is invalid or malformed.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Comment not found.'
+
+    delete:
+      operationId: R408
+      summary: 'R408: Remove Vote on a Comment'
+      description: 'Remove an existing vote (like/dislike) from a specific comment. Access: OWN'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to remove vote from'
+      responses:
+        '204':
+          description: 'Vote removed successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Comment not found.'
+
+  /comments/{comment_id}/report:
+    post:
+      operationId: R409
+      summary: 'R409: Report a Comment'
+      description: 'Report a specific comment for inappropriate content. Access: USR'
+      tags:
+        - 'M04: Comments'
+      parameters:
+        - in: path
+          name: comment_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the comment to report'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+              required:
+                - reason
+      responses:
+        '201':
+          description: 'Comment reported successfully.'
+        '400':
+          description: 'Request is invalid or malformed.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Comment not found.'
+
+  ########################################################### M05: Search ###########################################################
+  /search/posts:
+    get:
+      operationId: R501
+      summary: 'R501: Search Posts by Keywords'
+      description: 'Retrieve a list of posts matching the given keywords. Access: USR, SM'
+      tags:
+        - 'M05: Search'
+      parameters:
+        - in: query
+          name: keywords
+          schema:
+            type: string
+          required: true
+          description: 'Keywords to search for in post titles or content'
+      responses:
+        '200':
+          description: 'List of posts matching the search criteria.'
+
+  /search/comments:
+    get:
+      operationId: R502
+      summary: 'R502: Search Comments by Keywords'
+      description: 'Retrieve a list of comments matching the given keywords. Access: USR, SM'
+      tags:
+        - 'M05: Search'
+      parameters:
+        - in: query
+          name: keywords
+          schema:
+            type: string
+          required: true
+          description: 'Keywords to search for in comment content'
+      responses:
+        '200':
+          description: 'List of comments matching the search criteria.'
+          content:
+
+  /search/users:
+    get:
+      operationId: R503
+      summary: 'R503: Search Users by Username or Email'
+      description: 'Retrieve a list of users matching the given username or email. Access: USR, SM'
+      tags:
+        - 'M05: Search'
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          description: 'Username or email to search for'
+      responses:
+        '200':
+          description: 'List of users matching the search criteria.'
+
+  /search/categories:
+    get:
+      operationId: R504
+      summary: 'R504: Search Categories by Name'
+      description: 'Retrieve a list of categories matching the given name. Access: USR, SM'
+      tags:
+        - 'M05: Search'
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+          description: 'Category name to search for'
+      responses:
+        '200':
+          description: 'List of categories matching the search criteria.'
+
+  ##################################################### M06: System Management #####################################################
+  /admin/users:
+    get:
+      operationId: R601
+      summary: 'R601: List All Users'
+      description: 'Retrieve a list of all users in the system. Access: SM'
+      tags:
+        - 'M06: System Management'
+      responses:
+        '200':
+          description: 'List of all users.'
+        '403':
+          description: 'Permission denied.'
+
+  /admin/users/{id}/block:
+    put:
+      operationId: R602
+      summary: 'R602: Block a User'
+      description: 'Block a user from accessing the system. Access: SM'
+      tags:
+        - 'M06: System Management'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to block'
+      responses:
+        '204':
+          description: 'User successfully blocked.'
+        '403':
+          description: 'Permission denied.'
+
+  /admin/users/{id}/unblock:
+    put:
+      operationId: R603
+      summary: 'R603: Unblock a User'
+      description: 'Unblock a previously blocked user. Access: SM'
+      tags:
+        - 'M06: System Management'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the user to unblock'
+      responses:
+        '204':
+          description: 'User successfully unblocked.'
+        '403':
+          description: 'Permission denied.'
+
+  /admin/reports:
+    get:
+      operationId: R604
+      summary: 'R604: View All Reports'
+      description: 'Retrieve a list of all reports submitted by users. Access: SM'
+      tags:
+        - 'M06: System Management'
+      responses:
+        '200':
+          description: 'List of all reports.'
+        '403':
+          description: 'Permission denied.'
+
+  /admin/reports/{report_id}/resolve:
+    put:
+      operationId: R605
+      summary: 'R605: Resolve a Report'
+      description: 'Mark a report as resolved. Access: SM'
+      tags:
+        - 'M06: System Management'
+      parameters:
+        - in: path
+          name: report_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the report to resolve'
+      responses:
+        '204':
+          description: 'Report successfully resolved.'
+        '403':
+          description: 'Permission denied.'
+
+  /admin/categories:
+    post:
+      operationId: R606
+      summary: 'R606: Add a New Category'
+      description: 'Create a new category in the system. Access: SM'
+      tags:
+        - 'M06: System Management'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Name of the new category'
+              required:
+                - name
+      responses:
+        '201':
+          description: 'Category successfully created.'
+        '403':
+          description: 'Permission denied.'
+
+  /admin/categories/{category_id}:
+    delete:
+      operationId: R607
+      summary: 'R607: Delete a Category'
+      description: 'Remove a category from the system. Access: SM'
+      tags:
+        - 'M06: System Management'
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the category to delete'
+      responses:
+        '204':
+          description: 'Category successfully deleted.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Category not found.'
+
+  ####################################################### M07: Notifications ########################################################
+
+/notifications/follow/{notification_id}:
+    delete:
+      operationId: R701
+      summary: 'R701: Delete Follow Notification'
+      description: 'Delete a specific follow notification. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to delete'
+      responses:
+        '204':
+          description: 'Notification deleted successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+    put:
+      operationId: R702
+      summary: 'R702: Update Follow Notification Status'
+      description: 'Mark a follow notification as viewed or not viewed. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to update'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                viewed:
+                  type: boolean
+              required:
+                - viewed
+      responses:
+        '200':
+          description: 'Notification status updated successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+/notifications/vote/{notification_id}:
+    delete:
+      operationId: R703
+      summary: 'R703: Delete Vote Notification'
+      description: 'Delete a specific vote notification. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to delete'
+      responses:
+        '204':
+          description: 'Notification deleted successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+    put:
+      operationId: R704
+      summary: 'R704: Update Vote Notification Status'
+      description: 'Mark a vote notification as viewed or not viewed. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to update'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                viewed:
+                  type: boolean
+              required:
+                - viewed
+      responses:
+        '200':
+          description: 'Notification status updated successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+/notifications/comment/{notification_id}:
+    delete:
+      operationId: R705
+      summary: 'R705: Delete Comment Notification'
+      description: 'Delete a specific comment notification. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to delete'
+      responses:
+        '204':
+          description: 'Notification deleted successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+    put:
+      operationId: R706
+      summary: 'R706: Update Comment Notification Status'
+      description: 'Mark a comment notification as viewed or not viewed. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to update'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                viewed:
+                  type: boolean
+              required:
+                - viewed
+      responses:
+        '200':
+          description: 'Notification status updated successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+/notifications/post/{notification_id}:
+    delete:
+      operationId: R707
+      summary: 'R707: Delete Post Notification'
+      description: 'Delete a specific post notification. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to delete'
+      responses:
+        '204':
+          description: 'Notification deleted successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+
+    put:
+      operationId: R708
+      summary: 'R708: Update Post Notification Status'
+      description: 'Mark a post notification as viewed or not viewed. Access: OWN'
+      tags:
+        - 'M07: Notifications'
+      parameters:
+        - in: path
+          name: notification_id
+          schema:
+            type: integer
+          required: true
+          description: 'ID of the notification to update'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                viewed:
+                  type: boolean
+              required:
+                - viewed
+      responses:
+        '200':
+          description: 'Notification status updated successfully.'
+        '403':
+          description: 'Permission denied.'
+        '404':
+          description: 'Notification not found.'
+

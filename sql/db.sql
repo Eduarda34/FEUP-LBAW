@@ -211,6 +211,7 @@ CREATE TABLE user_report (
     reported_id INT REFERENCES users(id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
+    resolved_time TIMESTAMP,
     CONSTRAINT no_self_report_user CHECK (reporter_id <> reported_id)
 );
 
@@ -219,7 +220,8 @@ CREATE TABLE post_report (
     reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
-    time TIMESTAMP DEFAULT NOW()
+    time TIMESTAMP DEFAULT NOW(),
+    resolved_time TIMESTAMP
 );
 
 CREATE TABLE comment_report (
@@ -227,7 +229,8 @@ CREATE TABLE comment_report (
     reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
     comment_id INT REFERENCES comments(comment_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
-    time TIMESTAMP DEFAULT NOW()
+    time TIMESTAMP DEFAULT NOW(),
+    resolved_time TIMESTAMP
 );
 
 -- Blocked Users table with reason and reference to report leading to block

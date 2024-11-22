@@ -26,7 +26,7 @@ paths:
      summary: 'R101: Register Form'
      description: 'Provide new user registration form. Access: PUB'
      tags:
-       - 'M01: Authentication and Individual Profile'
+       - 'M01: Authentication'
      responses:
        '200':
          description: 'Ok. Show Sign-Up UI'
@@ -74,7 +74,7 @@ paths:
       summary: 'R103: Login Form'
       description: 'Provide login form. Access: PUB'
       tags:
-        - 'M01: Authentication and Individual Profile'
+        - 'M01: Authentication'
       responses:
         '200':
           description: 'Ok. Show Log-in UI'
@@ -1183,7 +1183,7 @@ paths:
 
   ####################################################### M07: Notifications ########################################################
 
-/notifications/follow/{notification_id}:
+  /notifications/follow/{notification_id}:
     delete:
       operationId: R701
       summary: 'R701: Delete Follow Notification'
@@ -1237,7 +1237,7 @@ paths:
         '404':
           description: 'Notification not found.'
 
-/notifications/vote/{notification_id}:
+  /notifications/vote/{notification_id}:
     delete:
       operationId: R703
       summary: 'R703: Delete Vote Notification'
@@ -1291,7 +1291,7 @@ paths:
         '404':
           description: 'Notification not found.'
 
-/notifications/comment/{notification_id}:
+  /notifications/comment/{notification_id}:
     delete:
       operationId: R705
       summary: 'R705: Delete Comment Notification'
@@ -1345,7 +1345,7 @@ paths:
         '404':
           description: 'Notification not found.'
 
-/notifications/post/{notification_id}:
+  /notifications/post/{notification_id}:
     delete:
       operationId: R707
       summary: 'R707: Delete Post Notification'

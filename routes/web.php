@@ -5,10 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\ItemController;
 
-use App\Http\Controllers\PostController;
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+
+use App\Http\Controllers\Auth\ViewNewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,12 +28,6 @@ Route::redirect('/', '/login');
 Route::controller(CardController::class)->group(function () {
     Route::get('/cards', 'list')->name('cards');
     Route::get('/cards/{id}', 'show');
-});
-
-// Posts
-Route::controller(PostController::class)->group(function () {
-    Route::get('/posts', 'list')->name('posts');
-    Route::get('/posts/{post_id}', 'show');
 });
 
 
@@ -60,4 +54,9 @@ Route::controller(LoginController::class)->group(function () {
 Route::controller(RegisterController::class)->group(function () {
     Route::get('/register', 'showRegistrationForm')->name('register');
     Route::post('/register', 'register');
+});
+
+//View news
+Route::controller(RegisterController::class)->group(function () {
+    Route::get('/top-news', [NewsController::class, 'topNews'])->name('news.top');
 });

@@ -17,17 +17,29 @@
             // Fix for Firefox autofocus CSS bug
             // See: http://stackoverflow.com/questions/18943276/html-5-autofocus-messes-up-css-loading/18945951#18945951
         </script>
-        <script type="text/javascript" src={{ url('js/app.js') }} defer>
-        </script>
+        <script type="text/javascript" src="{{ url('js/app.js') }}" defer></script>
     </head>
     <body>
         <main>
+            <!-- Updated Header Section -->
             <header>
-                <h1><a href="{{ url('/posts') }}">NewsNet</a></h1>
+                <div class="logo">
+                    <h1><a href="{{ url('/posts') }}">NewsNet</a></h1>
+                </div>
+                <nav>
                 @if (Auth::check())
-                    <a class="button" href="{{ url('/logout') }}"> Logout </a> <span>{{ Auth::user()->name }}</span>
-                @endif
+                        <!-- User Dropdown -->
+                        <div class="dropdown">
+                            <a class="button dropbtn">{{ Auth::user()->username }}</a>
+                            <div class="dropdown-content">
+                                <a href="/users/{{ Auth::user()->id }}">Profile</a>
+                                <a href="{{ url('/logout') }}">Logout</a>
+                            </div>
+                        </div>
+                    @endif
+                </nav>
             </header>
+            <!-- Content Section -->
             <section id="content">
                 @yield('content')
             </section>

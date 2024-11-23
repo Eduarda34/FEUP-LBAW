@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 // Added to define Eloquent relationships.
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -67,14 +68,14 @@ class User extends Authenticatable
      * Get the followed users for a user.
      */
     public function following(): BelongsToMany {
-        return $this->belongsToMany(User::class, 'follows', 'id_follower', 'id_followed');
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followed_id');
     }
 
     /**
      * Get the follower users for a user.
      */
     public function followers(): BelongsToMany {
-        return $this->belongsToMany(User::class, 'follows', 'id_followed', 'id_follower');
+        return $this->belongsToMany(User::class, 'follows', 'followed_id', 'follower_id');
     }
 
     /**

@@ -1,26 +1,71 @@
 body {
-    background-color: #ffffff;
-    color: #9b4dca;
+    background-color: #ffffff; /* White background */
+    color: #333333; /* Neutral text color */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
   }
   main > header {
-    display: grid;
+    display: flex;
     grid-template-columns: 1fr auto auto;
+    justify-content: space-between;
     align-items: center;
-    background-color: #d2afe7;
-    padding: 1em;
+    background-color: #d2e2d8; /* Light green for header background */
+    padding: 20px;
     margin: 1em;
+    position: relative;
   }
   main > header h1 {
-    margin: 0;
+    color: #4c8c4a; /* Green links */
+    text-decoration: none;
+    margin: 0 15px;
   }
   main > header a.button {
-    margin: 1em;
-    justify-self: center;
-  }
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-decoration: underline;
+    border: none;
+    background: none;
+    color: inherit;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+main > header a.button:hover {
+    background: none;
+    box-shadow: none; 
+}
+
+
   main > header span {
     margin: 1em;
     justify-self: center;
   }
+  header .search-bar {
+    position: relative;
+  }
+
+  header .search-bar input {
+    padding: 5px 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+  }
+
+  header .search-bar button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #4c8c4a;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
   #cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -159,4 +204,46 @@ body {
   input[type=password]:focus {
     border-color: #9b4dca;
   }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    margin-top: 5px;
+    right: 0; /* Align to the right of the dropdown */
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block; /* Show the dropdown on hover */
+}
+
+.dropdown:hover .dropbtn::after {
+    transform: rotate(180deg); /* Flip arrow when active */
+}
+
+.dropbtn::after {
+    content: "▼";
+    font-size: 0.8em;
+    margin-left: 5px;
+    display: inline-block;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+}
   

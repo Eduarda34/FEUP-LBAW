@@ -14,29 +14,51 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function list()
+    public function list(Request $request)
     {
-        // Check if the user is logged in.
         if (!Auth::check()) {
-            // Not logged in, redirect to login.
-            return redirect('/login');
-
+            $feedType = 'recent';
         } else {
-            // The user is logged in.
-
-            // Get all posts.
-            $posts = Post::orderBy('post_id', 'desc')->get();
-
-            // Check if the current user can list the posts.
-            $this->authorize('list', Post::class);
-
-            // The current user is authorized to list posts.
-
-            // Use the pages.posts template to display all posts.
-            return view('pages.posts', [
-                'posts' => $posts
-            ]);
+            // Determine the feed type from the query parameter.(Default 'recent')
+            $feedType = $request->query('feed', 'recent');
         }
+
+        // Authorize viewing posts.
+        $this->authorize('list', Post::class);
+
+        // Fetch posts based on the feed type.
+        switch ($feedType) {
+            case 'popular':
+                $posts = Post::withCount([
+                    'votes as likes_count' => function ($query) {
+                        $query->where('is_like', true);
+                    },
+                    'votes as dislikes_count' => function ($query) {
+                        $query->where('is_like', false);
+                    },
+                    'comments'
+                ])
+                ->with('owner')
+                ->get()
+                ->sortByDesc(function ($post) {
+                    return ($post->likes_count - $post->dislikes_count) + $post->comments_count + $post->owner->reputation;
+                });
+                break;
+            case 'recommended':
+                // TODO
+                break;
+            case 'recent':
+            default:
+                // Sort by most recent.
+                $posts = Post::orderBy('created_at', 'desc')->get();
+                break;
+        }
+
+        // Render the posts view.
+        return view('pages.posts', [
+            'posts' => $posts,
+            'feedType' => $feedType,
+        ]);
     }
 
     /**

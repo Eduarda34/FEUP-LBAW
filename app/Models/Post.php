@@ -19,7 +19,7 @@ class Post extends Model
      * Get the user that owns the post.
      */
     public function owner(): BelongsTo  {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**

@@ -60,6 +60,11 @@ Route::controller(RegisterController::class)->group(function () {
     Route::post('/register', 'register');
 });
 
+// Static Pages
+/* Route::controller(StaticPageController::class)->group(function () {
+    Route::get('/about', 'showAboutPage').>name('about');
+}); */
+
 // Users
 Route::controller(UserController::class)->group(function () {
     Route::get('/users', 'list');

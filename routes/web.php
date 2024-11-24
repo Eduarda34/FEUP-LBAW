@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,3 +113,15 @@ Route::controller(PostController::class)->group(function () {
     Route::delete('/api/comments/{comment_id}/vote', 'removeVote')->name('comments.removeVote');
 });
  */
+
+ //Search
+Route::prefix('admin/users')->name('admin.users.')->group(function () {
+    Route::get('/', [SearchController::class, 'index'])->name('index');
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
+    Route::get('/create', [SearchController::class, 'create'])->name('create');
+    Route::post('/store', [SearchController::class, 'store'])->name('store');
+    Route::get('/{id}', [SearchController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [SearchController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [SearchController::class, 'update'])->name('update');
+    Route::delete('/{id}', [SearchController::class, 'destroy'])->name('destroy');
+});

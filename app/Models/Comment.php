@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Comment extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'comment_id';
 
     /**
      * Get the user that owns the comment.
@@ -22,7 +25,7 @@ class Comment extends Model
      * Get the post that the comment belongs.
      */
     public function post(): BelongsTo  {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Post::class, 'post_id', 'post_id');
     }
 
     /**
@@ -37,5 +40,12 @@ class Comment extends Model
      */
     public function replies(): HasMany  {
         return $this->hasMany(Comment::class, 'replies', 'parent_comment_id', 'comment_id');
+    }
+
+    /**
+     * Get the votes for a post.
+     */
+    public function votes(): HasMany  {
+        return $this->hasMany(CommentVote::class, 'comment_id', 'comment_id');
     }
 }

@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Post extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'post_id';
 
     /**
      * Get the user that owns the post.
@@ -22,7 +26,7 @@ class Post extends Model
      * Get the comments for a post.
      */
     public function comments(): HasMany  {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class, 'post_id', 'post_id');
     }
 
     /**
@@ -39,4 +43,10 @@ class Post extends Model
         return $this->belongsToMany(User::class, 'user_favorites', 'post_id', 'user_id');
     }
 
+    /**
+     * Get the votes for a post.
+     */
+    public function votes(): HasMany  {
+        return $this->hasMany(PostVote::class, 'post_id', 'post_id');
+    }
 }

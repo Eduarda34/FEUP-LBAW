@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -103,9 +104,7 @@ class UserController extends Controller
 
         $this->authorize('follow', $user);
 
-        $followed = User::findOrFail($user->id);
-
-        $isFollowed = $followed->followers()->where('id', Auth::user()->id)->exists();
+        $isFollowed = $user->followers()->where('follower_id', Auth::user()->id)->exists();
 
         if (!$isFollowed) {
             Auth::user()->followers()->attach($user->id);
@@ -122,12 +121,46 @@ class UserController extends Controller
         
         $this->authorize('unfollow', $user);
 
-        $followed = User::findOrFail($user->id);
-
-        $isFollowed = $followed->followers()->where('id', Auth::user()->id)->exists();
+        $isFollowed = $user->followers()->where('follower_id', Auth::user()->id)->exists();
 
         if ($isFollowed) {
             Auth::user()->followers()->detach($user->id);
+        }
+    }
+
+    /**
+     * Follow a specific category.
+     */
+    public function followCategory(Request $request, int $category_id) {
+
+        // See if category exists
+        $category = Category::findOrFail($category_id);
+
+        $this->authorize('followCategory', User::class);
+
+        // Check if category is already followed
+        $isFollowed = $category->users()->where('user_id', Auth::user()->id)->exists();
+
+        if (!$isFollowed) {
+            Auth::user()->followed_categories()->attach($category->category_id);
+        }
+    }
+
+    /**
+     * Unfollow a specific category.
+     */
+    public function unfollowCategory(Request $request, int $category_id) {
+
+        // See if category exists
+        $category = Category::findOrFail($category_id);
+
+        $this->authorize('unfollowCategory', User::class);
+
+        // Check if category is already followed
+        $isFollowed = $category->users()->where('user_id', Auth::user()->id)->exists();
+
+        if ($isFollowed) {
+            Auth::user()->followed_categories()->attach($category->category_id);
         }
     }
 }

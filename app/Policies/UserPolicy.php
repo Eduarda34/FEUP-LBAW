@@ -72,10 +72,26 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can follow other user.
+     * Determine whether the user can unfollow other user.
      */
     public function unfollow(User $user, User $model): bool
     {
         return $user->id !== $model->id;
+    }
+
+    /**
+     * Determine whether the user can follow a category.
+     */
+    public function followCategory(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can unfollow a category.
+     */
+    public function unfollowCategory(User $user): bool
+    {
+        return true;
     }
 }

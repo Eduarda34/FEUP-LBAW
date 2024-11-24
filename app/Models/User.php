@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 // Added to define Eloquent relationships.
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -90,5 +91,12 @@ class User extends Authenticatable
      */
     public function followed_categories(): BelongsToMany {
         return $this->belongsToMany(Category::class, 'user_category', 'user_id', 'category_id');
+    }
+
+    /**
+     * Get the system_managers for a user.
+     */
+    public function system_managers(): HasOne {
+        return $this->hasOne(SystemManager::class);
     }
 }

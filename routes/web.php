@@ -88,13 +88,13 @@ Route::controller(UserController::class)->group(function () {
 // Posts
 Route::controller(PostController::class)->group(function () {
     Route::get('/posts', 'list')->name('posts');
-    Route::get('/posts/create', 'showPostCreatorForm');
+    Route::get('/posts/create', [PostController::class, 'showPostCreatorForm'])->name('posts.create');
     Route::get('/posts/favorites', 'favorites')->name('posts.favorites');
     Route::get('/posts/category/{category_id}', 'listByCategory')->name('posts.category');
     Route::get('/posts/{post_id}', 'show');
     Route::get('/posts/{post_id}/edit', 'showPostEditorForm')->name('posts.edit');
     // API
-    Route::post('/api/posts', 'create')->name('posts.create');
+    Route::post('/api/posts', [PostController::class, 'create'])->name('posts.store');
     Route::put('/api/posts/{post_id}', 'update')->name('posts.update');
     Route::delete('/api/posts/{post_id}', 'delete')->name('posts.delete');
     Route::post('/api/posts/{post_id}/vote', 'vote')->name('posts.vote');

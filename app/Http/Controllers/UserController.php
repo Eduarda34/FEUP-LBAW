@@ -57,22 +57,25 @@ class UserController extends Controller
      */
     public function update(Request $request, int $id)
     {   
-        // Get the user.
+        // Get the user by ID
         $user = User::findOrFail($id);
 
-        $this->authorize('update', User::class);
-        $user = Auth::user();
+        // Authorize the update action
+        $this->authorize('update', $user);
 
+        // Validate the input
         $request->validate([
-            'username' => 'max:50|unique:users,username,'.$user->id,
-            'email' => 'email|max:250|unique:users,email,'.$user->id
+            'username' => 'required|max:50|unique:users,username,' . $user->id,
+            'email' => 'required|email|max:250|unique:users,email,' . $user->id,
         ]);
 
+        // Update the user's information
         $user->username = $request->input('username');
         $user->email = $request->input('email');
-
         $user->save();
-        return redirect('users/'.$user->id);
+
+        // Redirect to the user's profile
+        return redirect('users/' . $user->id)->with('success', 'Profile updated successfully!');
     }
 
     /**

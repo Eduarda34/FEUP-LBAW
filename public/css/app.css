@@ -11,6 +11,7 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: #d2e2d8; /* Light green for header background */
+    border-radius: 8px;
     padding: 20px;
     margin: 1em;
     position: relative;
@@ -74,6 +75,7 @@ main > header a.button:hover {
     display: flex;
     flex-direction: column;
     background-color: #d3edc3;
+    border-radius: 8px;
     padding: 1em;
     margin: 1em;
   }
@@ -127,11 +129,17 @@ main > header a.button:hover {
   #content label {
     font-weight: normal;
   }
+  #content > #profile-container {
+    grid-template-columns: 1fr auto auto;
+    justify-content: space-between;
+    margin: 1em;
+    position: relative;
+  }
   #content > form {
     margin: 0 auto;
     padding: 1em;
     max-width: 20em;
-    border: 1px solid #d2afe7;
+    border: 1px solid #588368;
   }
   #content > form .error {
     font-weight: bold;
@@ -186,23 +194,23 @@ main > header a.button:hover {
    * Some styles might be missing
    **/
   button {
-    background-color: #9b4dca;
-    border-color: #9b4dca;
+    background-color: #588368;
+    border-color: #588368;
   }
   a.button {
-    background-color: #9b4dca;
-    border-color: #9b4dca;
+    background-color: #435c4f;
+    border-color: #435c4f;
   }
   a.button.button-outline {
-    color: #9b4dca;
+    color: #435c4f;
   }
   a {
-    color: #9b4dca;
+    color: #435c4f;
   }
   input[type=text]:focus,
   input[type=email]:focus,
   input[type=password]:focus {
-    border-color: #9b4dca;
+    border-color: #81b294;
   }
   .dropdown {
     position: relative;
@@ -216,7 +224,7 @@ main > header a.button:hover {
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     margin-top: 5px;
-    right: 0; /* Align to the right of the dropdown */
+    right: 0;
 }
 
 .dropdown-content a {
@@ -231,11 +239,11 @@ main > header a.button:hover {
 }
 
 .dropdown:hover .dropdown-content {
-    display: block; /* Show the dropdown on hover */
+    display: block;
 }
 
 .dropdown:hover .dropbtn::after {
-    transform: rotate(180deg); /* Flip arrow when active */
+    transform: rotate(180deg);
 }
 
 .dropbtn::after {
@@ -246,4 +254,8 @@ main > header a.button:hover {
     transform: rotate(0deg);
     transition: transform 0.2s ease;
 }
-  
+
+.profile-info > p {
+  margin: 0;
+  padding-left: 20px;
+}

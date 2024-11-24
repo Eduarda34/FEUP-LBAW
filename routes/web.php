@@ -31,25 +31,6 @@ use App\Http\Controllers\SearchController;
 // Home
 Route::redirect('/', '/login');
 
-// Cards
-Route::controller(CardController::class)->group(function () {
-    Route::get('/cards', 'list')->name('cards');
-    Route::get('/cards/{id}', 'show');
-});
-
-// API
-Route::controller(CardController::class)->group(function () {
-    Route::put('/api/cards', 'create');
-    Route::delete('/api/cards/{card_id}', 'delete');
-});
-
-Route::controller(ItemController::class)->group(function () {
-    Route::put('/api/cards/{card_id}', 'create');
-    Route::post('/api/item/{id}', 'update');
-    Route::delete('/api/item/{id}', 'delete');
-});
-
-
 // Authentication
 Route::controller(LoginController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
@@ -111,7 +92,7 @@ Route::controller(PostController::class)->group(function () {
 // Comments
 Route::controller(CommentController::class)->group(function () {
     Route::get('/posts/{post_id}/comments', 'list')->name('comments.list');
-    Route::get('/comments/{comment_id}', 'showCommentEditorForm')->name('comments.edit');
+    Route::get('/comments/{comment_id}/edit', 'showCommentEditorForm')->name('comments.edit');
     // API
     Route::post('/api/posts/{post_id}/comments', 'create')->name('comments.create');
     Route::put('/api/comments/{comment_id}', 'update')->name('comments.update');

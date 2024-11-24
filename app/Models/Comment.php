@@ -18,7 +18,7 @@ class Comment extends Model
      * Get the user that owns the comment.
      */
     public function owner(): BelongsTo  {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**

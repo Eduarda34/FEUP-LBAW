@@ -14,6 +14,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,7 +93,7 @@ Route::controller(PostController::class)->group(function () {
     Route::get('/posts/create', [PostController::class, 'showPostCreatorForm'])->name('posts.create');
     Route::get('/posts/favorites', 'favorites')->name('posts.favorites');
     Route::get('/posts/category/{category_id}', 'listByCategory')->name('posts.category');
-    Route::get('/posts/{post_id}', 'show');
+    Route::get('/posts/{post_id}', 'show')->name('posts.show');
     Route::get('/posts/{post_id}/edit', 'showPostEditorForm')->name('posts.edit');
     // API
     Route::post('/api/posts', [PostController::class, 'create'])->name('posts.store');
@@ -129,3 +131,11 @@ Route::controller(CommentController::class)->group(function () {
     Route::post('/sys/categories', 'addCategory')->name('admin.categories.add');
     Route::put('/sys/categories/{category_id}', 'updateCategory')->name('admin.categories.update');
 }); */
+
+// Search
+ Route::controller(SearchController::class)->group(function () {
+    Route::get('/search/posts', 'searchPosts')->name('search.posts');
+    //Route::get('/search/comments', 'searchComments')->name('search.comments');
+    Route::get('/search/users', 'searchUsers')->name('search.users');
+    //Route::get('/search/categories', 'searchCategories')->name('search.categories');
+});

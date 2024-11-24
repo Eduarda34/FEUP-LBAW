@@ -91,7 +91,7 @@ Route::controller(PostController::class)->group(function () {
     Route::get('/posts/create', 'showPostCreatorForm');
     Route::get('/posts/favorites', 'favorites')->name('posts.favorites');
     Route::get('/posts/category/{category_id}', 'listByCategory')->name('posts.category');
-    Route::get('/posts/{post_id}', 'show');
+    Route::get('/posts/{post_id}', 'show')->name('posts.show');
     Route::get('/posts/{post_id}/edit', 'showPostEditorForm')->name('posts.edit');
     // API
     Route::post('/api/posts', 'create')->name('posts.create');

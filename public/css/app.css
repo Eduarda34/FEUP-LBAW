@@ -276,3 +276,244 @@ main > header a.button:hover {
   margin: 0;
   padding-left: 20px;
 }
+
+#post {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 0 20px; /* Horizontal padding */
+  height: 100%;
+}
+
+.post-main {
+  display: flex;
+  width: 100%;
+  margin: 30px 30px;
+  flex-wrap: wrap;
+  height: 100%;
+}
+
+.post-left {
+  flex: 2;
+  max-width: 60%;
+  padding: 0 20px;
+  color: #588368;
+}
+
+.post-right {
+  flex: 1;
+  max-width: 40%;
+  min-height: 100%;
+  background-color: #f9f9f9;
+  padding: 0px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #588368;
+}
+
+.post-header .edit {
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.post-header .edit:hover {
+  text-decoration: underline;
+}
+
+.post-time {
+  font-size: 14px;
+  color: #588368;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.author {
+  font-size: 16px;
+  color: #007bff;
+}
+
+.author a {
+  text-decoration: none;
+}
+
+.author a:hover {
+  text-decoration: underline;
+}
+
+.stats {
+  display: flex;
+  align-items: right;
+}
+
+.votes {
+  display: flex;
+  flex-direction: column; 
+  align-items: right;
+  font-size: 14px;
+  color: #555;
+}
+
+.vote-icon {
+  margin-right: 5px;
+}
+
+.votes span {
+  margin-left: 5px;
+}
+
+.suggested-news {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  width: 100%;
+  margin-top: 0px;
+  height: 100%;
+}
+
+.suggested-news h3 {
+  font-size: 24px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.suggested-item {
+  margin-bottom: 20px;
+}
+
+.suggested-item h4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.suggested-item h4 a {
+  color: #588368;
+  text-decoration: none;
+  flex: 1;
+  text-transform: uppercase;
+}
+
+.suggested-author {
+  font-size: 16px;
+  color: #555;
+  margin-left: 10px;
+}
+
+.suggested-item h4 a:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 768px) {
+  #post {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0 15px; /* Less padding on smaller screens */
+  }
+
+  .post-main {
+      width: 100%;
+  }
+
+  .post-right {
+      width: 100%;
+      margin-top: 20px;
+  }
+
+  .post-left {
+      max-width: 100%;
+  }
+
+  .suggested-item h4 {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .suggested-author {
+      margin-left: 0;
+  }
+}
+
+.comment {
+  border: 1px solid #588368;
+  border-radius: 5px;
+  padding: 5px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.edit-link {
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.edit-link:hover {
+  text-decoration: underline;
+}
+
+.comment-footer {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+}
+
+.comment-stats {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.commentvotes {
+  margin-left: 10px;
+}
+
+.vote-btn {
+  background: none;               /* No background */
+  border: none;                   /* No border */
+  padding: 20px;                  /* Padding to control the size */
+  height: 30px;                   /* Height of the button */
+  width: 30px;                    /* Width of the button */
+  text-align: center;             /* Center align the icon */
+  font-size: 30px;                /* Font size for the icon */
+  font-weight: bolder;            /* Make text bolder */
+  color: #588368;                 /* Default color */
+  border-radius: 50%;             /* Make the button circular */
+  display: flex;                  /* Flexbox for centering content */
+  justify-content: center;        /* Center content horizontally */
+  align-items: center;            /* Center content vertically */
+}
+
+.vote-btn:hover {
+  color: #0b2e06;                 /* Change font color on hover */
+  background-color: gainsboro;    /* Change background color on hover */
+}
+
+.vote-icon {
+  font-size: 30px;                /* Icon font size */
+}
+
+.vote-btn .vote-icon.filled {
+  color: #0b2e06;                 /* Change color of the icon if filled */
+}

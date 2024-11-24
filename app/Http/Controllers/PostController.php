@@ -10,7 +10,27 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
-{
+{   
+
+    public function getPopularPosts()
+    {
+        $posts = Post::withCount([
+            'votes as likes_count' => function ($query) {
+                $query->where('is_like', true);
+            },
+            'votes as dislikes_count' => function ($query) {
+                $query->where('is_like', false);
+            },
+            'comments'
+        ])
+        ->with('owner')
+        ->get()
+        ->sortByDesc(function ($post) {
+            return ($post->likes_count - $post->dislikes_count) + $post->comments_count + $post->owner->reputation;
+        });
+        return $posts;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -29,20 +49,7 @@ class PostController extends Controller
         // Fetch posts based on the feed type.
         switch ($feedType) {
             case 'popular':
-                $posts = Post::withCount([
-                    'votes as likes_count' => function ($query) {
-                        $query->where('is_like', true);
-                    },
-                    'votes as dislikes_count' => function ($query) {
-                        $query->where('is_like', false);
-                    },
-                    'comments'
-                ])
-                ->with('owner')
-                ->get()
-                ->sortByDesc(function ($post) {
-                    return ($post->likes_count - $post->dislikes_count) + $post->comments_count + $post->owner->reputation;
-                });
+                $posts = $this->getPopularPosts();
                 break;
             case 'recommended':
                 // TODO
@@ -116,7 +123,9 @@ class PostController extends Controller
         $post->user_id = Auth::user()->id;
 
         // Save the post and return it as JSON.
+        $post->timestamps = false; // Disable timestamps temporarily
         $post->save();
+        $post->timestamps = true;
         $post->categories()->attach($request->input('categories'));
         return response()->json($post);
     }
@@ -134,7 +143,8 @@ class PostController extends Controller
 
         // Use the pages.post template to display the post.
         return view('pages.post', [
-            'post' => $post
+            'post' => $post,
+            'suggested_news' => $this->getPopularPosts(),
         ]);
     }
 
@@ -229,24 +239,40 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($post_id);
 
-        // Create a blank new vote.
-        $vote = new PostVote();
+        $existingVote = PostVote::where('user_id', Auth::id())
+                                ->where('post_id', $post->post_id)
+                                ->first();
 
-        // Check if the current user is authorized to vote in this post.
-        $this->authorize('vote', $post);
+        $isLike = $request->input('is_like') === '1' ? true : false;
 
-        $request->validate([
-            'is_like' => 'required|boolean',
-        ]);
-        
-        // Set vote details.
-        $vote->is_like = $request->input('is_like');
-        $vote->user_id = Auth::user()->id;
-        $vote->post_id = $post->post_id;
+        if(!$existingVote){
+            // Create a blank new vote.
+            $vote = new PostVote();
 
-        // Save the vote and return it as JSON.
-        $vote->save();
-        return response()->json($vote);
+            // Check if the current user is authorized to vote in this post.
+            $this->authorize('vote', $post);
+
+            $request->validate([
+                'is_like' => 'required|boolean',
+            ]);
+            
+            // Set vote details.
+            $vote->is_like = $request->input('is_like');
+            $vote->user_id = Auth::user()->id;
+            $vote->post_id = $post->post_id;
+
+            // Save the vote and return it as JSON.
+            $vote->save();
+            return redirect('posts/'.$post->post_id);
+        } else if($existingVote->is_like !== $isLike) {
+            return $this->editVote($request, $post_id);
+        } else if($existingVote->is_like === $isLike) {
+            return $this->removeVote($request, $post_id);
+        } else {
+            return response()->json([
+                'error' => 'Request is invalid or malformed.'
+            ], 400);
+        }
     }
 
     /**
@@ -261,22 +287,23 @@ class PostController extends Controller
             'is_like' => 'required|boolean',
         ]);
         
-        $vote = PostVote::firstOrCreate(
-            [
-                'user_id' => Auth::user()->id,
-                'post_id' => $post_id
-            ],
-            [
-                'is_like' => $request->input('is_like')
-            ]
-            );
-            
-        // Check if the current user is authorized to edit this vote.
-        $this->authorize('editVote', $post, $vote);
+        $vote = PostVote::where('user_id', Auth::user()->id)
+                        ->where('post_id', $post_id)
+                        ->first();
 
-        // Save the vote and return it as JSON.
+        if (!$vote) {
+            $vote = new PostVote();
+            $vote->user_id = Auth::user()->id;
+            $vote->post_id = $post_id;
+        }
+
+        $this->authorize('editVote', [$post, $vote]);
+
+        $vote->is_like = $request->input('is_like');
+
+        // Save the vote and redirect
         $vote->save();
-        return response()->json($vote);
+        return redirect('posts/'.$post->post_id);
     }
 
     /**
@@ -292,11 +319,11 @@ class PostController extends Controller
 
         if($vote) {
             // Check if the current user is authorized to vote in this post.
-            $this->authorize('removeVote', $post, $vote);
+            $this->authorize('removeVote', [$post, $vote]);
 
             // Delete the vote and return it as JSON.
             $vote->delete();
-            return response()->json($vote);
+            return redirect('posts/'.$post->post_id);
         }
         
         return response()->json([

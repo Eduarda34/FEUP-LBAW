@@ -12,8 +12,8 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
-    {
+    public function show(int $id){
+        
         // Get the user.
         $user = User::findOrFail($id);
 
@@ -36,8 +36,11 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function showProfileEditorForm(User $user)
-    {
+    public function showProfileEditorForm(int $id){
+
+        // Get the user.
+        $user = User::findOrFail($id);
+
         $this->authorize('showProfileEditorForm', $user);
         return view('pages.profileEditor', [
             'user' => $user, 
@@ -51,8 +54,11 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
-    {
+    public function update(Request $request, int $id){
+
+        // Get the user.
+        $user = User::findOrFail($id);
+
         $this->authorize('update', User::class);
         $user = Auth::user();
 
@@ -71,8 +77,8 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(User $id)
-    {
+    public function delete(int $id){
+
         // Find the user.
         $user = User::find($id);
 
@@ -87,7 +93,10 @@ class UserController extends Controller
     /**
      * Follow a specific user.
      */
-    public function follow(Request $request, User $user) {
+    public function follow(Request $request, int $id){
+
+        // Get the user.
+        $user = User::findOrFail($id);
 
         $this->authorize('follow', User::class);
 
@@ -103,7 +112,10 @@ class UserController extends Controller
     /**
      * Unfollow a specific user.
      */
-    public function unfollow(Request $request, User $user) {
+    public function unfollow(Request $request, int $id){
+
+        // Get the user.
+        $user = User::findOrFail($id);
 
         $this->authorize('unfollow', User::class);
 

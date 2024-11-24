@@ -517,3 +517,63 @@ main > header a.button:hover {
 .vote-btn .vote-icon.filled {
   color: #0b2e06;                 /* Change color of the icon if filled */
 }
+
+
+/* Style for the search bar section */
+#search-bar {
+  background-color: #7c9987; /* Soft green background */
+  border-radius: 15px;        /* Rounded corners */
+  padding: 10px 10px;         /* Padding around the content */
+  margin-top: 20px;           /* Space between the header and search bar */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  margin: 5px 30px;
+  height: 60px;
+}
+
+/* Form styling */
+#search-bar form {
+  display: flex;               /* Flexbox layout */
+  justify-content: right;     /* Horizontally center content */
+  height: 100%;
+}
+
+/* Input field styling */
+#search-bar input {
+  padding: 10px;               /* Padding inside the input */
+  font-size: 16px;             /* Font size */
+  border-radius: 20px;         /* Rounded corners */
+  border: 1px solid #ccc;     /* Light gray border */
+  width: 40%;                  /* Input width */
+  margin-right: 10px;          /* Space between input and button */
+}
+
+/* Button styling */
+#search-bar button {
+  background-color: #005237;   /* Green background */
+  color: white;                /* White text */
+  font-size: 16px;             /* Font size */
+  border-radius: 20px;         /* Rounded corners */
+  border: none;                /* Remove border */
+}
+
+/* Button hover effect */
+#search-bar button:hover {
+  background-color: #009c51;   /* Slightly darker green on hover */
+}
+
+.create-post-btn {
+  text-align: center; /* Center the button horizontally */
+  margin-top: 20px;    /* Space between the posts and the button */
+}
+
+.create-post-btn .button {
+  background-color:#2e9f7a; /* Green background */
+  color: white;             /* White text */
+  font-size: 16px;          /* Font size */
+  border-radius: 20px;      /* Rounded corners */
+  text-decoration: none;    /* Remove underline */
+}
+
+.create-post-btn .button:hover {
+  background-color: rgb(19, 98, 53)/* Darker green on hover */
+}

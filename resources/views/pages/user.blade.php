@@ -7,9 +7,19 @@
         <h2>{{ $user->username }}</h2>
 
         <div class="profile-info">
-            <p>{{ $user->username}} <a href="/users/{{ $user->id }}/edit">[edit]</a></p>
+            @if (Auth::check() && Auth::id() === $user->id)
+                <p>{{ $user->username}} <a href="/users/{{ $user->id }}/edit">[edit]</a></p>
+            @endif
             <p>Followers: {{ $user->followers }}</p>
             <p>Following: {{ $user->following }}</p>
         </div>
+    </section>
+
+    <!-- Search Bar Section -->
+    <section id="search-bar">
+        <form action="{{ route('search.users') }}" method="GET" >
+            <input type="text" name="query" placeholder="Search users..." required>
+            <button type="submit">Search</button>
+        </form>
     </section>
 @endsection

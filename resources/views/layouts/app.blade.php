@@ -39,6 +39,14 @@
                     @endif
                 </nav>
             </header>
+
+            <!-- Search Bar Section -->
+            <section id="search-bar">
+                <form action="{{ route('search.posts') }}" method="GET" >
+                    <input type="text" name="query" placeholder="Search posts..." required>
+                    <button type="submit">Search</button>
+                </form>
+            </section>
             <!-- Content Section -->
             <section id="content">
                 @yield('content')

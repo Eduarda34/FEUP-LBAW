@@ -111,7 +111,7 @@ Route::controller(PostController::class)->group(function () {
 // Comments
 Route::controller(CommentController::class)->group(function () {
     Route::get('/posts/{post_id}/comments', 'list')->name('comments.list');
-    Route::put('/comments/{comment_id}', 'showCommentEditorForm')->name('comments.edit');
+    Route::get('/comments/{comment_id}', 'showCommentEditorForm')->name('comments.edit');
     // API
     Route::post('/api/posts/{post_id}/comments', 'create')->name('comments.create');
     Route::put('/api/comments/{comment_id}', 'update')->name('comments.update');

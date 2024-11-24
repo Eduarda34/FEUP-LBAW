@@ -108,9 +108,7 @@ class PostController extends Controller
      * Create a new resource.
      */
     public function create(Request $request)
-    {
-        dd($request->input('categories'));
-        
+    {        
         // Create a blank new post.
         $post = new Post();
 
@@ -134,7 +132,7 @@ class PostController extends Controller
         $post->save();
         $post->timestamps = true;
         $post->categories()->attach($request->input('categories'));
-        return response()->json($post);
+        return redirect('posts/'.$post->post_id);
     }
 
     /**
@@ -164,9 +162,13 @@ class PostController extends Controller
         $post = Post::findOrFail($post_id);
         
         $this->authorize('showPostEditorForm', $post);
+
+        // Fetch all categories to display in the form.
+        $categories = Category::all();
         
         return view('pages.postEditor', [
             'post' => $post, 
+            'categories' => $categories,
             'old' => [
                 'title' => $post->title,
                 'body' => $post->body,
@@ -189,14 +191,14 @@ class PostController extends Controller
             'title' => 'required|string|max:50',
             'body' => 'required|string|max:10000',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,category_id'
         ]);
 
         $post->title = $request->input('title');
         $post->body = $request->input('body');
 
         $post->save();
-        $post->categories()->attach($request->input('categories'));
+        $post->categories()->sync($request->input('categories'));
         return redirect('posts/'.$post->post_id);
     }
 

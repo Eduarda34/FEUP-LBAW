@@ -5,7 +5,7 @@
     <h1>Edit Comment</h1>
 
     <!-- Comment Edit Form -->
-    <form action="{{ route('comments.update', $comment->id) }}" method="POST">
+    <form action="{{ route('comments.update', $comment->comment_id) }}" method="POST">
         @csrf
         @method('PUT')
 

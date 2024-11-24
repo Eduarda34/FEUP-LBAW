@@ -64,7 +64,7 @@ class CommentController extends Controller
         $comment->timestamps = false; // Disable timestamps temporarily
         $comment->save();
         $comment->timestamps = true;
-        return redirect('posts/'.$comment->post_id)
+        return redirect('posts/'.$comment->post_id);
     }
 
     /**
@@ -90,7 +90,7 @@ class CommentController extends Controller
     public function update(Request $request, int $comment_id)
     {
         // Get the comment.
-        $comment = Comment::findOrFail($post_id);
+        $comment = Comment::findOrFail($comment_id);
 
         $this->authorize('update', $comment);
 
@@ -101,7 +101,7 @@ class CommentController extends Controller
         $comment->body = $request->input('body');
 
         $comment->save();
-        return redirect('posts/'.$comment->post_id.'/comments');
+        return redirect('posts/'.$comment->post_id);
     }
 
     /**

@@ -51,7 +51,12 @@
                 @foreach ($categories as $category)
                     <option 
                         value="{{ $category->category_id }}"
-                        @if(in_array($category->category_id, old('categories', $post->categories->pluck('category_id')->toArray()))) selected @endif
+                        @if (in_array(
+                            $category->category_id, 
+                            old('categories', $post->categories->pluck('category_id')->toArray())
+                        )) 
+                            selected 
+                        @endif
                     >
                         {{ $category->name }}
                     </option>

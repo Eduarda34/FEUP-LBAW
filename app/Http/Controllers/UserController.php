@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -36,8 +37,11 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function showProfileEditorForm(User $user)
-    {
+    public function showProfileEditorForm(int $id)
+    {   
+        // Get the user.
+        $user = User::findOrFail($id);
+
         $this->authorize('showProfileEditorForm', $user);
         return view('pages.profileEditor', [
             'user' => $user, 
@@ -51,8 +55,11 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
-    {
+    public function update(Request $request, int $id)
+    {   
+        // Get the user.
+        $user = User::findOrFail($id);
+
         $this->authorize('update', User::class);
         $user = Auth::user();
 
@@ -71,7 +78,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(User $id)
+    public function delete(int $id)
     {
         // Find the user.
         $user = User::find($id);
@@ -87,13 +94,14 @@ class UserController extends Controller
     /**
      * Follow a specific user.
      */
-    public function follow(Request $request, User $user) {
+    public function follow(Request $request, int $id) {
 
-        $this->authorize('follow', User::class);
+        // Get the user.
+        $user = User::findOrFail($id);
 
-        $followed = User::findOrFail($user->id);
+        $this->authorize('follow', $user);
 
-        $isFollowed = $followed->followers()->where('id', Auth::user()->id)->exists();
+        $isFollowed = $user->followers()->where('follower_id', Auth::user()->id)->exists();
 
         if (!$isFollowed) {
             Auth::user()->followers()->attach($user->id);
@@ -103,16 +111,53 @@ class UserController extends Controller
     /**
      * Unfollow a specific user.
      */
-    public function unfollow(Request $request, User $user) {
+    public function unfollow(Request $request, int $id) {
 
-        $this->authorize('unfollow', User::class);
+        // Get the user.
+        $user = User::findOrFail($id);
+        
+        $this->authorize('unfollow', $user);
 
-        $followed = User::findOrFail($user->id);
-
-        $isFollowed = $followed->followers()->where('id', Auth::user()->id)->exists();
+        $isFollowed = $user->followers()->where('follower_id', Auth::user()->id)->exists();
 
         if ($isFollowed) {
             Auth::user()->followers()->detach($user->id);
+        }
+    }
+
+    /**
+     * Follow a specific category.
+     */
+    public function followCategory(Request $request, int $category_id) {
+
+        // See if category exists
+        $category = Category::findOrFail($category_id);
+
+        $this->authorize('followCategory', User::class);
+
+        // Check if category is already followed
+        $isFollowed = $category->users()->where('user_id', Auth::user()->id)->exists();
+
+        if (!$isFollowed) {
+            Auth::user()->followed_categories()->attach($category->category_id);
+        }
+    }
+
+    /**
+     * Unfollow a specific category.
+     */
+    public function unfollowCategory(Request $request, int $category_id) {
+
+        // See if category exists
+        $category = Category::findOrFail($category_id);
+
+        $this->authorize('unfollowCategory', User::class);
+
+        // Check if category is already followed
+        $isFollowed = $category->users()->where('user_id', Auth::user()->id)->exists();
+
+        if ($isFollowed) {
+            Auth::user()->followed_categories()->attach($category->category_id);
         }
     }
 }

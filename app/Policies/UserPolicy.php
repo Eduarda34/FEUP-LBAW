@@ -32,11 +32,19 @@ class UserPolicy
     }
 
     /**
+     * Determine whether the user can access the profile editor form.
+     */
+    public function showProfileEditorForm(User $user, User $model): bool
+    {
+        return $user->id === $model->id;
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, User $model): bool
     {
-        return $user === $model;
+        return $user->id === $model->id;
     }
 
     /**
@@ -44,15 +52,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, User $model): bool
-    {
-        //
+        return $user->id == $model->id;
     }
 
     /**
@@ -61,5 +61,37 @@ class UserPolicy
     public function forceDelete(User $user, User $model): bool
     {
         //
+    }
+
+    /**
+     * Determine whether the user can follow other user.
+     */
+    public function follow(User $user, User $model): bool
+    {
+        return $user->id !== $model->id;
+    }
+
+    /**
+     * Determine whether the user can unfollow other user.
+     */
+    public function unfollow(User $user, User $model): bool
+    {
+        return $user->id !== $model->id;
+    }
+
+    /**
+     * Determine whether the user can follow a category.
+     */
+    public function followCategory(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can unfollow a category.
+     */
+    public function unfollowCategory(User $user): bool
+    {
+        return true;
     }
 }

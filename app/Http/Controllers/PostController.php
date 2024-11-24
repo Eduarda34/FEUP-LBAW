@@ -95,15 +95,22 @@ class PostController extends Controller
      */
     public function showPostCreatorForm()
     {
-        $this->authorize('showPostCreatorForm', Post::class);
-        return view('pages.postCreator');
+    $this->authorize('showPostCreatorForm', Post::class);
+    
+    // Fetch all categories to display in the form.
+    $categories = Category::all();
+
+    return view('pages.postCreator', compact('categories'));
     }
+
 
     /**
      * Create a new resource.
      */
     public function create(Request $request)
     {
+        dd($request->input('categories'));
+        
         // Create a blank new post.
         $post = new Post();
 
@@ -114,7 +121,7 @@ class PostController extends Controller
             'title' => 'required|unique:posts|max:255',
             'body' => 'required',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,category_id'
         ]);
         
         // Set post details.

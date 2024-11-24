@@ -74,8 +74,9 @@ main > header a.button:hover {
   #cards article.card {
     display: flex;
     flex-direction: column;
-    background-color: #d3edc3;
+    background-color: transparent;
     border-radius: 8px;
+    border: 3px solid #d2e2d8;
     padding: 1em;
     margin: 1em;
   }
@@ -126,6 +127,12 @@ main > header a.button:hover {
     background-color: white;
     margin: 0;
   }
+  #content {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1em;
+    margin: 2em;
+  }
   #content label {
     font-weight: normal;
   }
@@ -151,6 +158,16 @@ main > header a.button:hover {
   }
   #content > form input {
     background-color: white;
+  }
+  #content > #categories {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    padding: 1em;
+  }
+  #content > #categories > h2 {
+    color: #435c4f;
+    border-bottom: 3px solid #d2e2d8;
   }
   @media (max-width: 70em) {
     #cards {

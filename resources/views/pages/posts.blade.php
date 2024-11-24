@@ -8,4 +8,9 @@
     @each('partials.post', $posts, 'post')
 </section>
 
+<section id="categories">
+    <h2>Categories</h2>
+    <!-- Category content here -->
+</section>
+
 @endsection

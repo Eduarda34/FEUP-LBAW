@@ -74,7 +74,7 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     reputation INT DEFAULT 0,
-    created_time TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- System Managers table
@@ -109,9 +109,9 @@ CREATE TABLE posts (
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
-    created_time TIMESTAMP DEFAULT NOW(),
-    updated_time TIMESTAMP,
-    CONSTRAINT check_edition_date CHECK (updated_time IS NULL OR updated_time > created_time) -- BR12
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP,
+    CONSTRAINT check_edition_date CHECK (updated_at IS NULL OR updated_at > created_at) -- BR12
 );
 
 -- Post categories
@@ -127,9 +127,9 @@ CREATE TABLE comments (
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     body TEXT NOT NULL,
-    created_time TIMESTAMP DEFAULT NOW(),
-    updated_time TIMESTAMP,
-    CONSTRAINT check_edition_date CHECK (updated_time IS NULL OR updated_time > created_time) -- BR12
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP,
+    CONSTRAINT check_edition_date CHECK (updated_at IS NULL OR updated_at > created_at) -- BR12
 );
 
 -- Comment replies table
@@ -249,7 +249,7 @@ CREATE INDEX index_posts_user_id ON posts USING hash(user_id);
 
 CREATE INDEX index_comments_post_id ON comments USING hash(post_id);
 
-CREATE INDEX index_posts_created_time ON posts USING btree(created_time);
+CREATE INDEX index_posts_created_time ON posts USING btree(created_at);
 CLUSTER posts USING index_posts_created_time;
 
 -- Full-text Search Indexes
@@ -489,7 +489,7 @@ CREATE FUNCTION check_comment_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF NEW.created_time <= (SELECT created_time FROM posts WHERE post_id = NEW.post_id) THEN
+        IF NEW.created_at <= (SELECT created_at FROM posts WHERE post_id = NEW.post_id) THEN
             RAISE EXCEPTION 'Comment date must be after the article date';
         END IF;
         RETURN NEW;
@@ -507,7 +507,7 @@ CREATE FUNCTION check_reply_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF (SELECT created_time FROM comments WHERE comment_id = NEW.comment_id) <= (SELECT created_time FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
+        IF (SELECT created_at FROM comments WHERE comment_id = NEW.comment_id) <= (SELECT created_at FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
             RAISE EXCEPTION 'Reply date must be after the parent comment date';
         END IF;
         RETURN NEW;
@@ -599,7 +599,7 @@ BEGIN TRANSACTION;
 
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-INSERT INTO posts (user_id, title, body, created_time)
+INSERT INTO posts (user_id, title, body, created_at)
 VALUES ($user_id, $title, $body, NOW());
 
 INSERT INTO post_categories (post_id, category_id)
@@ -614,7 +614,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM follow_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -625,7 +625,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM vote_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -636,7 +636,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM comment_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -647,7 +647,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM post_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -659,7 +659,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 SELECT *
 FROM comments 
 WHERE post_id = $post_id 
-ORDER BY created_time ASC;
+ORDER BY created_at ASC;
 
 END TRANSACTION;
 
@@ -668,7 +668,7 @@ BEGIN TRANSACTION;
 
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-INSERT INTO comments (post_id, user_id, body, created_time)
+INSERT INTO comments (post_id, user_id, body, created_at)
 VALUES ($post_id, $user_id, $body, NOW());
 
 INSERT INTO replies (parent_comment_id, comment_id)
@@ -684,7 +684,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 SELECT *
 FROM replies 
 WHERE parent_comment_id = $parent_comment_id 
-ORDER BY created_time ASC;
+ORDER BY created_at ASC;
 
 END TRANSACTION;
 
@@ -759,7 +759,7 @@ END TRANSACTION; */
 
 -- Populate
 
-INSERT INTO users (username, email, password, reputation, created_time) VALUES 
+INSERT INTO users (username, email, password, reputation, created_at) VALUES 
     ('johndoe', 'johndoe@example.com', 'password123', 10, NOW()),
     ('janedoe', 'janedoe@example.com', 'password456', 20, NOW()),
     ('alice', 'alice@example.com', 'password789', 5, NOW()),
@@ -778,7 +778,7 @@ INSERT INTO user_category (user_id, category_id) VALUES
     (2, 2),
     (3, 3);
 
-INSERT INTO posts (user_id, title, body, created_time) VALUES 
+INSERT INTO posts (user_id, title, body, created_at) VALUES 
     (1, 'Latest in AI Technology', 'This article explores the latest advancements in AI...', '2024-11-21 18:31:35.42877'),
     (2, 'Breakthroughs in Quantum Computing', 'Quantum computing is advancing at a rapid pace...', '2024-11-21 18:31:35.42877'),
     (4, 'Health Benefits of a Balanced Diet', 'A balanced diet is crucial for maintaining health...', '2024-11-21 18:31:35.42877');
@@ -788,7 +788,7 @@ INSERT INTO post_categories (post_id, category_id) VALUES
     (2, 2),
     (3, 3);
 
-INSERT INTO comments (post_id, user_id, body, created_time) VALUES 
+INSERT INTO comments (post_id, user_id, body, created_at) VALUES 
     (1, 2, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),
     (1, 3, 'Quantum computing has so much potential!', '2024-11-21 19:32:35.42877'),
     (3, 1, 'Very informative, thanks!', '2024-11-21 19:31:35.42877');

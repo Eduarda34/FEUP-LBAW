@@ -1,6 +1,6 @@
 -- Populate
 
-INSERT INTO users (username, email, password, reputation, created_time) VALUES 
+INSERT INTO users (username, email, password, reputation, created_at) VALUES 
     ('johndoe', 'johndoe@example.com', 'password123', 10, NOW()),
     ('janedoe', 'janedoe@example.com', 'password456', 20, NOW()),
     ('alice', 'alice@example.com', 'password789', 5, NOW()),
@@ -19,7 +19,7 @@ INSERT INTO user_category (user_id, category_id) VALUES
     (2, 2),
     (3, 3);
 
-INSERT INTO posts (user_id, title, body, created_time) VALUES 
+INSERT INTO posts (user_id, title, body, created_at) VALUES 
     (1, 'Latest in AI Technology', 'This article explores the latest advancements in AI...', '2024-11-21 18:31:35.42877'),
     (2, 'Breakthroughs in Quantum Computing', 'Quantum computing is advancing at a rapid pace...', '2024-11-21 18:31:35.42877'),
     (4, 'Health Benefits of a Balanced Diet', 'A balanced diet is crucial for maintaining health...', '2024-11-21 18:31:35.42877');
@@ -29,7 +29,7 @@ INSERT INTO post_categories (post_id, category_id) VALUES
     (2, 2),
     (3, 3);
 
-INSERT INTO comments (post_id, user_id, body, created_time) VALUES 
+INSERT INTO comments (post_id, user_id, body, created_at) VALUES 
     (1, 2, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),
     (1, 3, 'Quantum computing has so much potential!', '2024-11-21 19:32:35.42877'),
     (3, 1, 'Very informative, thanks!', '2024-11-21 19:31:35.42877');

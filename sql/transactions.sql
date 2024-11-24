@@ -5,7 +5,7 @@ BEGIN TRANSACTION;
 
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-INSERT INTO posts (user_id, title, body, created_time)
+INSERT INTO posts (user_id, title, body, created_at)
 VALUES ($user_id, $title, $body, NOW());
 
 INSERT INTO post_categories (post_id, category_id)
@@ -20,7 +20,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM follow_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -31,7 +31,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM vote_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -42,7 +42,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM comment_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -53,7 +53,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 
 SELECT * FROM post_notification
 WHERE user_id = $user_id
-ORDER BY created_time DESC;
+ORDER BY created_at DESC;
 
 END TRANSACTION;
 
@@ -65,7 +65,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 SELECT *
 FROM comments 
 WHERE post_id = $post_id 
-ORDER BY created_time ASC;
+ORDER BY created_at ASC;
 
 END TRANSACTION;
 
@@ -74,7 +74,7 @@ BEGIN TRANSACTION;
 
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-INSERT INTO comments (post_id, user_id, body, created_time)
+INSERT INTO comments (post_id, user_id, body, created_at)
 VALUES ($post_id, $user_id, $body, NOW());
 
 INSERT INTO replies (parent_comment_id, comment_id)
@@ -90,7 +90,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY;
 SELECT *
 FROM replies 
 WHERE parent_comment_id = $parent_comment_id 
-ORDER BY created_time ASC;
+ORDER BY created_at ASC;
 
 END TRANSACTION;
 

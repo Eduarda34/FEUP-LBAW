@@ -74,7 +74,7 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     reputation INT DEFAULT 0,
-    created_time TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- System Managers table
@@ -109,9 +109,9 @@ CREATE TABLE posts (
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     title VARCHAR(255) NOT NULL,
     body TEXT NOT NULL,
-    created_time TIMESTAMP DEFAULT NOW(),
-    updated_time TIMESTAMP,
-    CONSTRAINT check_edition_date CHECK (updated_time IS NULL OR updated_time > created_time) -- BR12
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP,
+    CONSTRAINT check_edition_date CHECK (updated_at IS NULL OR updated_at > created_at) -- BR12
 );
 
 -- Post categories
@@ -127,9 +127,9 @@ CREATE TABLE comments (
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     body TEXT NOT NULL,
-    created_time TIMESTAMP DEFAULT NOW(),
-    updated_time TIMESTAMP,
-    CONSTRAINT check_edition_date CHECK (updated_time IS NULL OR updated_time > created_time) -- BR12
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP,
+    CONSTRAINT check_edition_date CHECK (updated_at IS NULL OR updated_at > created_at) -- BR12
 );
 
 -- Comment replies table
@@ -249,7 +249,7 @@ CREATE INDEX index_posts_user_id ON posts USING hash(user_id);
 
 CREATE INDEX index_comments_post_id ON comments USING hash(post_id);
 
-CREATE INDEX index_posts_created_time ON posts USING btree(created_time);
+CREATE INDEX index_posts_created_time ON posts USING btree(created_at);
 CLUSTER posts USING index_posts_created_time;
 
 -- Full-text Search Indexes
@@ -489,7 +489,7 @@ CREATE FUNCTION check_comment_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF NEW.created_time <= (SELECT created_time FROM posts WHERE post_id = NEW.post_id) THEN
+        IF NEW.created_at <= (SELECT created_at FROM posts WHERE post_id = NEW.post_id) THEN
             RAISE EXCEPTION 'Comment date must be after the article date';
         END IF;
         RETURN NEW;
@@ -507,7 +507,7 @@ CREATE FUNCTION check_reply_date()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF (SELECT created_time FROM comments WHERE comment_id = NEW.comment_id) <= (SELECT created_time FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
+        IF (SELECT created_at FROM comments WHERE comment_id = NEW.comment_id) <= (SELECT created_at FROM comments WHERE comment_id = NEW.parent_comment_id) THEN
             RAISE EXCEPTION 'Reply date must be after the parent comment date';
         END IF;
         RETURN NEW;

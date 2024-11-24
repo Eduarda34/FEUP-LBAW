@@ -812,7 +812,7 @@ paths:
       summary: 'R314: Create Post Form'
       description: 'Page that allows a user to create a post. Access: USR'
       tags:
-        - 'M03: Posts'
+        - 'M03: News Posts'
       responses:
         '200':
           description: 'Ok. Show post creation UI.'
@@ -825,7 +825,7 @@ paths:
       summary: 'R315: Edit Post Form'
       description: 'Page that allows a user to update his post. Access: OWN, SM'
       tags:
-        - 'M03: Posts'
+        - 'M03: News Posts'
       parameters:
         - in: path
           name: post_id
@@ -847,7 +847,7 @@ paths:
       summary: 'R316: Report Post Form'
       description: 'Page that allows a user to report a post. Access: USR'
       tags:
-        - 'M03: Posts'
+        - 'M03: News Posts'
       parameters:
         - in: path
           name: post_id
@@ -1669,17 +1669,6 @@ paths:
           description: 'Notification not found.'
 
 ######################################################### M08: Static Pages #########################################################
-
-  /home:
-    get:
-      operationId: R801
-      summary: 'R801: Home Page'
-      description: 'Show Home page. Access: SM, USR, PUB'
-      tags:
-        - 'M08: Static Pages'
-      responses:
-        '200':
-          description: 'Home page returned successfully.'
 
   /about:
     get:

@@ -15,13 +15,13 @@ use App\Models\Community;
 class SearchController extends Controller {
     public function index()
     {
-        $users = User::all(); // Lista todos os usuários
+        $users = User::all();
         return view('admin.users.index', compact('users'));
     }
 
     public function search(Request $request)
     {
-        $query = $request->input('query'); // Obter a string de pesquisa
+        $query = $request->input('query');
         $users = User::where('name', 'like', '%' . $query . '%')
                      ->orWhere('email', 'like', '%' . $query . '%')
                      ->get();

@@ -7,9 +7,9 @@
         <h2>{{ $user->username }}</h2>
 
         <div class="profile-info">
-            <p>{{ $user->username}}<a href="/users/{{ $user->id }}/edit">[edit]</a></p>
-            <p>{{ $user->followers }}</p>
-            <p>{{ $user->following }}</p>
+            <p>{{ $user->username}} <a href="/users/{{ $user->id }}/edit">[edit]</a></p>
+            <p>Followers: {{ $user->followers }}</p>
+            <p>Following: {{ $user->following }}</p>
         </div>
     </section>
 @endsection

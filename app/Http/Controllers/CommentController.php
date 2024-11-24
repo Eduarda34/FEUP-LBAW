@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\CommentVote;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
@@ -60,8 +61,10 @@ class CommentController extends Controller
         $comment->post_id = $post_id;
 
         // Save the comment and return it as JSON.
+        $comment->timestamps = false; // Disable timestamps temporarily
         $comment->save();
-        return response()->json($comment);
+        $comment->timestamps = true;
+        return redirect('posts/'.$comment->post_id)
     }
 
     /**

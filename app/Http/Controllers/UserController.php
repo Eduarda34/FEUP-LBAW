@@ -12,8 +12,8 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id){
-        
+    public function show(int $id)
+    {
         // Get the user.
         $user = User::findOrFail($id);
 
@@ -36,8 +36,8 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function showProfileEditorForm(int $id){
-
+    public function showProfileEditorForm(int $id)
+    {   
         // Get the user.
         $user = User::findOrFail($id);
 
@@ -54,8 +54,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id){
-
+    public function update(Request $request, int $id)
+    {   
         // Get the user.
         $user = User::findOrFail($id);
 
@@ -77,8 +77,8 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(int $id){
-
+    public function delete(int $id)
+    {
         // Find the user.
         $user = User::find($id);
 
@@ -93,12 +93,12 @@ class UserController extends Controller
     /**
      * Follow a specific user.
      */
-    public function follow(Request $request, int $id){
+    public function follow(Request $request, int $id) {
 
         // Get the user.
         $user = User::findOrFail($id);
 
-        $this->authorize('follow', User::class);
+        $this->authorize('follow', $user);
 
         $followed = User::findOrFail($user->id);
 
@@ -112,12 +112,12 @@ class UserController extends Controller
     /**
      * Unfollow a specific user.
      */
-    public function unfollow(Request $request, int $id){
+    public function unfollow(Request $request, int $id) {
 
         // Get the user.
         $user = User::findOrFail($id);
-
-        $this->authorize('unfollow', User::class);
+        
+        $this->authorize('unfollow', $user);
 
         $followed = User::findOrFail($user->id);
 

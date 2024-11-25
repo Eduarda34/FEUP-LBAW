@@ -12,6 +12,7 @@
             @endif
             <p>Followers: {{ $user->followers }}</p>
             <p>Following: {{ $user->following }}</p>
+            <p>Reputation: {{$user->reputation }}</p>
         </div>
     </section>
 

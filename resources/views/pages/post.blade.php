@@ -8,7 +8,7 @@
             <div class="post-left">
                 <!-- Title, Edit Link and Date in the same line -->
                 <div class="post-header">
-                    <h1>{{ strtoupper($post->title) }}</h1>
+                    <h2>{{ strtoupper($post->title) }}</h2>
                     @if (Auth::check() && Auth::id() === $post->user_id)
                         <a href="{{ route('posts.edit', $post->post_id) }}" class="edit">[edit]</a>
                     @endif

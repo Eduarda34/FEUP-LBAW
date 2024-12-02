@@ -127,11 +127,25 @@ main > header a.button:hover {
     background-color: white;
     margin: 0;
   }
-  #content {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
+  #login {
+    display: flex;
     gap: 1em;
     margin: 2em;
+  }
+  #content {
+    display: grid;
+    gap: 1em;
+    margin: 2em;
+  }
+  #content > h2 {
+    margin-left: 1em;
+    padding-top: 1em;
+    color: #005237;
+  }
+  #content > #content_body {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    margin-left: 1em;
   }
   #content label {
     font-weight: normal;
@@ -159,13 +173,13 @@ main > header a.button:hover {
   #content > form input {
     background-color: white;
   }
-  #content > #categories {
+  #content_body > #categories {
     display: flex;
     flex-direction: column;
     gap: 1.5em;
     padding: 1em;
   }
-  #content > #categories > h2 {
+  #content_body > #categories > h2 {
     color: #435c4f;
     border-bottom: 3px solid #d2e2d8;
   }
@@ -317,8 +331,7 @@ main > header a.button:hover {
   align-items: center;
 }
 
-.post-header h1 {
-  font-size: 24px;
+.post-header h2 {
   font-weight: bold;
   text-transform: uppercase;
   color: #588368;

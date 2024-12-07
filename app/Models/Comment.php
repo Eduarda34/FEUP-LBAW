@@ -48,4 +48,11 @@ class Comment extends Model
     public function votes(): HasMany  {
         return $this->hasMany(CommentVote::class, 'comment_id', 'comment_id');
     }
+
+    /**
+     * Get the reports related to the comment.
+     */
+    public function reports(): HasMany {
+        return $this->hasMany(CommentReport::class, 'comment_id');
+    }
 }

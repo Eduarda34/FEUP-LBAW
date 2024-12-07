@@ -16,6 +16,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SystemManagerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,14 +105,14 @@ Route::controller(CommentController::class)->group(function () {
 });
 
 //System Manager
-/*  Route::controller(AdminController::class)->group(function () {
-    Route::put('/sys/users/{id}/block', 'blockUser')->name('admin.users.block');
-    Route::put('/sys/users/{id}/unblock', 'unblockUser')->name('admin.users.unblock');
-    Route::get('/sys/reports', 'listReports')->name('admin.reports.list');
-    Route::put('/sys/reports/{report_id}/resolve', 'resolveReport')->name('admin.reports.resolve');
-    Route::post('/sys/categories', 'addCategory')->name('admin.categories.add');
-    Route::put('/sys/categories/{category_id}', 'updateCategory')->name('admin.categories.update');
-}); */
+ Route::controller(SystemManagerController::class)->group(function () {
+    Route::put('/sys/users/{id}/block', 'blockUser')->name('system.users.block');
+    Route::put('/sys/users/{id}/unblock', 'unblockUser')->name('system.users.unblock');
+    Route::get('/sys/reports', 'listReports')->name('system.reports.list');
+    Route::put('/sys/reports/{report_id}/resolve', 'resolveReport')->name('system.reports.resolve');
+    Route::post('/sys/categories', 'addCategory')->name('system.categories.add');
+    Route::put('/sys/categories/{category_id}', 'updateCategory')->name('system.categories.update');
+});
 
 // Search
  Route::controller(SearchController::class)->group(function () {

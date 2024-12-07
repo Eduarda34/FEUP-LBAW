@@ -49,4 +49,11 @@ class Post extends Model
     public function votes(): HasMany  {
         return $this->hasMany(PostVote::class, 'post_id', 'post_id');
     }
+
+    /**
+     * Get the reports related to the post.
+     */
+    public function reports(): HasMany {
+        return $this->hasMany(PostReport::class, 'post_id');
+    }
 }

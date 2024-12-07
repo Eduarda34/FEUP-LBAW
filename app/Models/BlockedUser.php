@@ -7,18 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SystemManager extends Model
+class BlockedUser extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
 
-    protected $primaryKey = 'sm_id';
+    protected $primaryKey = 'blocked_id';
 
     /**
      * Define a relationship to the User model.
      */
     public function user(): BelongsTo {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'blocked_id');
     }
 }

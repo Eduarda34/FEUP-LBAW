@@ -99,4 +99,39 @@ class User extends Authenticatable
     public function system_managers(): HasOne {
         return $this->hasOne(SystemManager::class);
     }
+
+    /**
+     * Get the user reports submitted by the user.
+     */
+    public function user_reporter(): HasMany {
+        return $this->hasMany(UserReport::class, 'reporter_id');
+    }
+
+    /**
+     * Get the user reports where the user is reported.
+     */
+    public function reported(): HasMany {
+        return $this->hasMany(UserReport::class, 'reported_id');
+    }
+
+    /**
+     * Get the post reports submitted by the user.
+     */
+    public function post_reporter(): HasMany {
+        return $this->hasMany(PostReport::class, 'reporter_id');
+    }
+
+    /**
+     * Get the comment reports submitted by the user.
+     */
+    public function comment_reporter(): HasMany {
+        return $this->hasMany(CommentReport::class, 'reporter_id');
+    }
+
+    /**
+     * Get the blocked user for a user.
+     */
+    public function blocked(): HasOne {
+        return $this->hasOne(BlockedUser::class);
+    }
 }

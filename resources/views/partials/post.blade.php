@@ -4,6 +4,6 @@
     </header>
     <div class="card">
         <p class="category">{{ $post->categories }}</p>
-        <p>{{ $post->body }}</p>
+        <p>{{ $post->synopsis }}</p>
     </div>
 </article>

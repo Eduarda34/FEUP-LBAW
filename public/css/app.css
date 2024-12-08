@@ -69,7 +69,6 @@ header .search-bar button {
 
 #cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
 }
 #cards article.card {
   display: flex;
@@ -161,6 +160,7 @@ header .search-bar button {
   padding: 1em;
   max-width: 20em;
   border: 1px solid #588368;
+  border-radius: 5px;
 }
 #content > form .error {
   font-weight: bold;
@@ -226,7 +226,7 @@ button {
 }
 a.button {
   background-color: #435c4f;
-  border-color: #435c4f;
+  border-color: #005237;
 }
 a.button.button-outline {
   color: #435c4f;
@@ -311,7 +311,7 @@ input[type=password]:focus {
   flex: 2;
   max-width: 60%;
   padding: 0 20px;
-  color: #588368;
+  color: #000000;
 }
 
 .post-right {
@@ -359,7 +359,8 @@ input[type=password]:focus {
 
 .author {
   font-size: 16px;
-  color: #007bff;
+  color: #588368;
+  text-decoration: underline;
 }
 
 .author a {
@@ -403,6 +404,8 @@ input[type=password]:focus {
 }
 
 .suggested-news h3 {
+  color: #3b5d47;
+  font-weight: bold;
   font-size: 24px;
   text-transform: uppercase;
   margin-bottom: 20px;
@@ -568,14 +571,14 @@ input[type=password]:focus {
   margin-top: 20px;
 }
 .create-post-btn .button {
-  background-color:#2e9f7a;
+  background-color:#005237;
   color: white;
   font-size: 16px;
   border-radius: 20px;
   text-decoration: none;
 }
 .create-post-btn .button:hover {
-  background-color: rgb(19, 98, 53);
+  background-color: #009c51;
 }
 input::placeholder, textarea::placeholder {
   font-family: 'Arial', sans-serif;

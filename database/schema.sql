@@ -761,9 +761,10 @@ END TRANSACTION; */
 -- Populate
 
 INSERT INTO users (username, email, password, reputation, created_at) VALUES 
-    ('johndoe', 'johndoe@example.com', 'password123', 10, NOW()),
-    ('janedoe', 'janedoe@example.com', 'password456', 20, NOW()),
-    ('alice', 'alice@example.com', 'password789', 5, NOW()),
+    ('admin', 'admin@lbaw2484.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 0, NOW()),
+    ('johndoe', 'johndoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 10, NOW()),
+    ('janedoe', 'janedoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 20, NOW()),
+    ('alice', 'alice@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 5, NOW()),
     ('Cristiano', 'cristiano_cr7_ronaldo@goat.pt', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 0, NOW());
 
 INSERT INTO system_managers (sm_id) VALUES (1);
@@ -775,12 +776,12 @@ INSERT INTO categories (name) VALUES
     ('Entertainment');
 
 INSERT INTO user_category (user_id, category_id) VALUES 
-    (1, 1),
+    (2, 1),
     (2, 2),
     (3, 3);
 
 INSERT INTO posts (user_id, title, synopsis, body, created_at) VALUES 
-    (1, 'Latest in AI Technology',
+    (5, 'Latest in AI Technology',
         'AI continues to reshape industries, with breakthroughs in generative content, robotics, and daily life applications. Highlights include advancements in AI-driven creativity, general-purpose robotics, and transformative consumer technologies.',
         'The integration of generative AI into media production has reached new heights. Tools like Runway’s latest video models are producing near-cinematic quality clips in seconds. Major film studios, including Paramount, are exploring generative AI for multilingual lip-syncing and realistic visual effects, signaling a shift in filmmaking techniques. Meanwhile, AI-driven platforms like Synthesia are enabling corporations to generate hyper-realistic avatars, used for everything from marketing to training materials. Inspired by the success of multimodal models like OpenAI’s GPT-4, roboticists are building general-purpose robots capable of handling diverse tasks. These AI systems can perform anything from flipping pancakes to opening doors, with applications ranging from household assistance to industrial automation. Models like DeepMind’s “Robocat” exemplify this progress, merging data self-generation with task versatility. 2024 has seen a surge in consumer-friendly AI applications, such as the Yarbo S1 Plus, an AI-powered snow blower, that autonomously clears driveways with precision mapping and obstacle avoidance, the Anura MagicMirror, that uses AI to assess health metrics like blood pressure and stress levels via facial analysis, bringing medical insights into homes, and AI-integrated pillows and mattresses created by companies like DeRucci, that adjust dynamically to improve sleep quality and reduce snoring. As AI becomes more pervasive, ethical dilemmas and challenges in disinformation management loom large. Generative AI tools, while impressive, also risk being weaponized for fake news and election disinformation. Efforts to counteract these threats, such as watermarking systems like DeepMind’s SynthID, remain in their infancy. The year ahead promises further integration of AI into daily life, but as these innovations expand, ensuring responsible deployment will be a critical focus for researchers and developers.',
         '2024-11-21 18:31:35.42877'),
@@ -801,7 +802,7 @@ INSERT INTO post_categories (post_id, category_id) VALUES
 INSERT INTO comments (post_id, user_id, body, created_at) VALUES 
     (1, 2, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),
     (1, 3, 'Quantum computing has so much potential!', '2024-11-21 19:32:35.42877'),
-    (3, 1, 'Very informative, thanks!', '2024-11-21 19:31:35.42877');
+    (3, 2, 'Very informative, thanks!', '2024-11-21 19:31:35.42877');
 
 INSERT INTO replies (parent_comment_id, comment_id) VALUES 
     (1, 2);
@@ -811,22 +812,22 @@ INSERT INTO post_votes (user_id, post_id, is_like, time) VALUES
     (3, 2, FALSE, NOW());
 
 INSERT INTO comment_votes (user_id, comment_id, is_like, time) VALUES 
-    (1, 1, TRUE, NOW()),
+    (5, 1, TRUE, NOW()),
     (2, 2, TRUE, NOW());
 
 INSERT INTO user_favorites (user_id, post_id) VALUES 
-    (1, 1),
+    (5, 1),
     (2, 3);
 
 INSERT INTO user_report (reporter_id, reported_id, reason, time) VALUES 
-    (1, 2, 'Inappropriate behavior', NOW()),
-    (3, 1, 'Spam content', NOW());
+    (5, 2, 'Inappropriate behavior', NOW()),
+    (3, 5, 'Spam content', NOW());
 
 INSERT INTO post_report (reporter_id, post_id, reason, time) VALUES 
     (2, 1, 'Inaccurate information', NOW());
 
 INSERT INTO comment_report (reporter_id, comment_id, reason, time) VALUES 
-    (1, 2, 'Offensive comment', NOW());
+    (5, 2, 'Offensive comment', NOW());
 
 INSERT INTO blocked_users (blocked_id, blocked_at, reason, report_id) VALUES 
     (2, NOW(), 'Repeated violations', 1);

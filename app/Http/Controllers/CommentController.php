@@ -20,31 +20,44 @@ class CommentController extends Controller
             // Not logged in, redirect to post.
             return redirect('/posts/'.$post_id);
 
-        } else {
-            // The user is logged in.
-
-            // Get post.
-            $post = Post::findOrFail($post_id);
-
-            $comments = $post->comments()->orderBy('created_at', 'desc')->get();
-
-            // Check if the current user can list the comments.
-            $this->authorize('list', Comment::class);
-
-            // The current user is authorized to list comments.
-
-            // Use the pages.comments template to display all comments.
-            return view('pages.comments', [
-                'comments' => $comments
-            ]);
         }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // The user is logged in.
+
+        // Get post.
+        $post = Post::findOrFail($post_id);
+
+        $comments = $post->comments()->orderBy('created_at', 'desc')->get();
+
+        // Check if the current user can list the comments.
+        $this->authorize('list', Comment::class);
+
+        // The current user is authorized to list comments.
+
+        // Use the pages.comments template to display all comments.
+        return view('pages.comments', [
+            'comments' => $comments
+        ]);
     }
 
     /**
      * Create a new resource.
      */
     public function create(Request $request, int $post_id)
-    {
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Create a blank new comment.
         $comment = new Comment();
 
@@ -71,7 +84,16 @@ class CommentController extends Controller
      * Show the form for editing the specified resource.
      */
     public function showCommentEditorForm(int $comment_id)
-    {
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Get the comment.
         $comment = Comment::findOrFail($comment_id);
 
@@ -88,7 +110,16 @@ class CommentController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, int $comment_id)
-    {
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Get the comment.
         $comment = Comment::findOrFail($comment_id);
 
@@ -108,7 +139,16 @@ class CommentController extends Controller
      * Remove the specified resource from storage.
      */
     public function delete(int $comment_id)
-    {
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Find the comment.
         $comment = Comment::findOrFail($comment_id);
 
@@ -148,6 +188,15 @@ class CommentController extends Controller
      */
     public function vote(Request $request, int $comment_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         $comment = Comment::findOrFail($comment_id);
 
         // Create a blank new vote.
@@ -175,6 +224,15 @@ class CommentController extends Controller
      */
     public function editVote(Request $request, int $comment_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         $comment = Comment::findOrFail($comment_id);
 
         
@@ -205,6 +263,15 @@ class CommentController extends Controller
      */
     public function removeVote(Request $request, int $comment_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         $comment = Comment::findOrFail($comment_id);
         
         $vote = CommentVote::where('comment_id', $comment_id)
@@ -232,6 +299,15 @@ class CommentController extends Controller
      */
     public function reply(Request $request, int $comment_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+        
         // Create a blank new comment.
         $reply = new Comment();
 

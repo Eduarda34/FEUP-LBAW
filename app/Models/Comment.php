@@ -46,7 +46,8 @@ class Comment extends Model
      * Get the votes for a post.
      */
     public function votes(): HasMany  {
-        return $this->hasMany(CommentVote::class, 'comment_id', 'comment_id');
+        return $this->hasMany(CommentVote::class, 'comment_id', 'comment_id')
+            ->whereNotIn('user_id', BlockedUser::query()->select('blocked_id'));
     }
 
     /**

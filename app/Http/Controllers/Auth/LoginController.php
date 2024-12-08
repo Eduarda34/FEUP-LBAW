@@ -19,6 +19,10 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
+            if (Auth::user()->blocked) {
+                // User blocked, redirect to logout.
+                return redirect('/logout');
+            }
             return redirect('/posts');
         } else {
             return view('auth.login');

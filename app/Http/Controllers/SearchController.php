@@ -19,6 +19,10 @@ class SearchController extends Controller
             // Not logged in, redirect to login.
             return redirect('/login');
         }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
 
         $request->validate([
             'query' => 'required|string|min:3',
@@ -43,6 +47,10 @@ class SearchController extends Controller
         if (!Auth::check()) {
             // Not logged in, redirect to login.
             return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
         }
 
         $request->validate([

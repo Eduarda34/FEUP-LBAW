@@ -112,6 +112,7 @@ Route::controller(CommentController::class)->group(function () {
     Route::put('/sys/reports/{report_id}/resolve', 'resolveReport')->name('system.reports.resolve');
     Route::post('/sys/categories', 'addCategory')->name('system.categories.add');
     Route::put('/sys/categories/{category_id}', 'updateCategory')->name('system.categories.update');
+    Route::put('/sys/categories/{category_id}', 'deleteCategory')->name('system.categories.delete');
 });
 
 // Search

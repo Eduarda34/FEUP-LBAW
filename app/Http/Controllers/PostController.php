@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\PostVote;
 use App\Models\Category;
+use App\Models\BlockedUser;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,7 @@ class PostController extends Controller
             'comments'
         ])
         ->with('owner')
+        ->whereNotIn('user_id', BlockedUser::query()->select('blocked_id'))
         ->get()
         ->sortByDesc(function ($post) {
             return ($post->likes_count - $post->dislikes_count) + $post->comments_count + $post->owner->reputation;
@@ -36,10 +38,14 @@ class PostController extends Controller
      */
     public function list(Request $request)
     {
+        // Determine the feed type from the query parameter.(Default 'recent')
         if (!Auth::check()) {
             $feedType = 'recent';
         } else {
-            // Determine the feed type from the query parameter.(Default 'recent')
+            if (Auth::user()->blocked) {
+                // User blocked, redirect to logout.
+                return redirect('/logout');
+            }
             $feedType = $request->query('feed', 'recent');
         }
 
@@ -57,7 +63,9 @@ class PostController extends Controller
             case 'recent':
             default:
                 // Sort by most recent.
-                $posts = Post::orderBy('created_at', 'desc')->get();
+                $posts = Post::whereNotIn('user_id', BlockedUser::query()->select('blocked_id'))
+                    ->orderBy('created_at', 'desc')
+                    ->get();
                 break;
         }
 
@@ -73,6 +81,13 @@ class PostController extends Controller
      */
     public function listByCategory(int $category_id)
     {   
+        if (Auth::check()) {
+            if (Auth::user()->blocked) {
+                // User blocked, redirect to logout.
+                return redirect('/logout');
+            }
+        }
+
         // Get category
         $category = Category::findOrFail($category_id);
         
@@ -94,13 +109,22 @@ class PostController extends Controller
      * Show the form for creating a new resource.
      */
     public function showPostCreatorForm()
-    {
-    $this->authorize('showPostCreatorForm', Post::class);
-    
-    // Fetch all categories to display in the form.
-    $categories = Category::all();
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
 
-    return view('pages.postCreator', compact('categories'));
+        $this->authorize('showPostCreatorForm', Post::class);
+        
+        // Fetch all categories to display in the form.
+        $categories = Category::all();
+
+        return view('pages.postCreator', compact('categories'));
     }
 
 
@@ -109,6 +133,15 @@ class PostController extends Controller
      */
     public function create(Request $request)
     {        
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Create a blank new post.
         $post = new Post();
 
@@ -140,6 +173,13 @@ class PostController extends Controller
      */
     public function show(int $post_id)
     {
+        if (Auth::check()) {
+            if (Auth::user()->blocked) {
+                // User blocked, redirect to logout.
+                return redirect('/logout');
+            }
+        }
+
         // Get the post.
         $post = Post::findOrFail($post_id);
 
@@ -158,6 +198,15 @@ class PostController extends Controller
      */
     public function showPostEditorForm(int $post_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Get the post.
         $post = Post::findOrFail($post_id);
         
@@ -182,6 +231,15 @@ class PostController extends Controller
      */
     public function update(Request $request, int $post_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Get the post.
         $post = Post::findOrFail($post_id);
 
@@ -207,6 +265,15 @@ class PostController extends Controller
      */
     public function delete(int $post_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Find the post.
         $post = Post::findOrFail($post_id);
 
@@ -246,6 +313,15 @@ class PostController extends Controller
      */
     public function vote(Request $request, int $post_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         $post = Post::findOrFail($post_id);
 
         $existingVote = PostVote::where('user_id', Auth::id())
@@ -289,6 +365,15 @@ class PostController extends Controller
      */
     public function editVote(Request $request, int $post_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         $post = Post::findOrFail($post_id);
 
         
@@ -320,6 +405,15 @@ class PostController extends Controller
      */
     public function removeVote(Request $request, int $post_id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         $post = Post::findOrFail($post_id);
         
         $vote = PostVote::where('post_id', $post_id)
@@ -351,20 +445,23 @@ class PostController extends Controller
         if (!Auth::check()) {
             // Not logged in, redirect to login.
             return redirect('/login');
-
-        } else {
-            // The user is logged in.
-
-            // Get all posts.
-            $posts = Auth::user()->favorites()->get();
-
-            // The current user is authorized to list posts.
-
-            // Use the pages.posts template to display all posts.
-            return view('pages.posts', [
-                'posts' => $posts
-            ]);
         }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // The user is logged in.
+
+        // Get all posts.
+        $posts = Auth::user()->favorites()->get();
+
+        // The current user is authorized to list posts.
+
+        // Use the pages.posts template to display all posts.
+        return view('pages.posts', [
+            'posts' => $posts
+        ]);
     }
 
     /**
@@ -376,22 +473,25 @@ class PostController extends Controller
         if (!Auth::check()) {
             // Not logged in, redirect to login.
             return redirect('/login');
-
-        } else {
-            // The user is logged in.
-
-            $post = Post::findOrFail($post_id);
-
-            // Check if the post is already in the user's favorites.
-            if (Auth::user()->favorites()->where('post_id', $post_id)->exists()) {
-                return response()->json(['message' => 'This post is already in your favorites.'], 400);
-            }
-    
-            // Add the post to the user's favorites.
-            Auth::user()->favorites()->attach($post_id);
-
-            return response()->json(['message' => 'Post added to favorites successfully.']);
         }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // The user is logged in.
+
+        $post = Post::findOrFail($post_id);
+
+        // Check if the post is already in the user's favorites.
+        if (Auth::user()->favorites()->where('post_id', $post_id)->exists()) {
+            return response()->json(['message' => 'This post is already in your favorites.'], 400);
+        }
+
+        // Add the post to the user's favorites.
+        Auth::user()->favorites()->attach($post_id);
+
+        return response()->json(['message' => 'Post added to favorites successfully.']);
     }
 
     /**
@@ -403,21 +503,24 @@ class PostController extends Controller
         if (!Auth::check()) {
             // Not logged in, redirect to login.
             return redirect('/login');
-
-        } else {
-            // The user is logged in.
-
-            $post = Post::findOrFail($post_id);
-
-            // Check if the post is already in the user's favorites.
-            if (!Auth::user()->favorites()->where('post_id', $post_id)->exists()) {
-                return response()->json(['message' => 'This post is not in your favorites.'], 400);
-            }
-    
-            // Add the post to the user's favorites.
-            Auth::user()->favorites()->detach($post_id);
-
-            return response()->json(['message' => 'Post removed from favorites successfully.']);
         }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // The user is logged in.
+
+        $post = Post::findOrFail($post_id);
+
+        // Check if the post is already in the user's favorites.
+        if (!Auth::user()->favorites()->where('post_id', $post_id)->exists()) {
+            return response()->json(['message' => 'This post is not in your favorites.'], 400);
+        }
+
+        // Add the post to the user's favorites.
+        Auth::user()->favorites()->detach($post_id);
+
+        return response()->json(['message' => 'Post removed from favorites successfully.']);
     }
 }

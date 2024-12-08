@@ -14,7 +14,14 @@ class UserController extends Controller
      * Display the specified resource.
      */
     public function show(int $id)
-    {
+    {   
+        if (Auth::check()) {
+            if (Auth::user()->blocked) {
+                // User blocked, redirect to logout.
+                return redirect('/logout');
+            }
+        }
+
         // Get the user.
         $user = User::findOrFail($id);
 
@@ -39,6 +46,15 @@ class UserController extends Controller
      */
     public function showProfileEditorForm(int $id)
     {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Get the user.
         $user = User::findOrFail($id);
 
@@ -57,6 +73,15 @@ class UserController extends Controller
      */
     public function update(Request $request, int $id)
     {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Get the user by ID
         $user = User::findOrFail($id);
 
@@ -83,6 +108,15 @@ class UserController extends Controller
      */
     public function delete(int $id)
     {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
         // Find the user.
         $user = User::find($id);
 
@@ -97,7 +131,16 @@ class UserController extends Controller
     /**
      * Follow a specific user.
      */
-    public function follow(Request $request, int $id) {
+    public function follow(Request $request, int $id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
 
         // Get the user.
         $user = User::findOrFail($id);
@@ -114,7 +157,16 @@ class UserController extends Controller
     /**
      * Unfollow a specific user.
      */
-    public function unfollow(Request $request, int $id) {
+    public function unfollow(Request $request, int $id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
 
         // Get the user.
         $user = User::findOrFail($id);
@@ -131,7 +183,16 @@ class UserController extends Controller
     /**
      * Follow a specific category.
      */
-    public function followCategory(Request $request, int $category_id) {
+    public function followCategory(Request $request, int $category_id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
 
         // See if category exists
         $category = Category::findOrFail($category_id);
@@ -149,7 +210,16 @@ class UserController extends Controller
     /**
      * Unfollow a specific category.
      */
-    public function unfollowCategory(Request $request, int $category_id) {
+    public function unfollowCategory(Request $request, int $category_id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
 
         // See if category exists
         $category = Category::findOrFail($category_id);

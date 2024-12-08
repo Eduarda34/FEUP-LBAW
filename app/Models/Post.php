@@ -26,7 +26,8 @@ class Post extends Model
      * Get the comments for a post.
      */
     public function comments(): HasMany  {
-        return $this->hasMany(Comment::class, 'post_id', 'post_id');
+        return $this->hasMany(Comment::class, 'post_id', 'post_id')
+            ->whereNotIn('user_id', BlockedUser::query()->select('blocked_id'));
     }
 
     /**
@@ -47,7 +48,8 @@ class Post extends Model
      * Get the votes for a post.
      */
     public function votes(): HasMany  {
-        return $this->hasMany(PostVote::class, 'post_id', 'post_id');
+        return $this->hasMany(PostVote::class, 'post_id', 'post_id')
+            ->whereNotIn('user_id', BlockedUser::query()->select('blocked_id'));
     }
 
     /**

@@ -97,7 +97,7 @@ class User extends Authenticatable
      * Get the system_managers for a user.
      */
     public function system_managers(): HasOne {
-        return $this->hasOne(SystemManager::class);
+        return $this->hasOne(SystemManager::class, 'sm_id');
     }
 
     /**
@@ -132,6 +132,6 @@ class User extends Authenticatable
      * Get the blocked user for a user.
      */
     public function blocked(): HasOne {
-        return $this->hasOne(BlockedUser::class);
+        return $this->hasOne(BlockedUser::class, 'blocked_id');
     }
 }

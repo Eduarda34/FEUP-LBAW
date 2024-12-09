@@ -33,6 +33,9 @@
                             <a class="button dropbtn">{{ Auth::user()->username }}</a>
                             <div class="dropdown-content">
                                 <a href="/users/{{ Auth::user()->id }}">Profile</a>
+                                @if (Auth::user()->system_managers)
+                                    <a href="/sys/reports">Reports</a>
+                                @endif
                                 <a href="{{ url('/logout') }}">Logout</a>
                             </div>
                         </div>

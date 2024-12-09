@@ -92,11 +92,17 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|max:50|unique:users,username,' . $user->id,
             'email' => 'required|email|max:250|unique:users,email,' . $user->id,
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         // Update the user's information
         $user->username = $request->input('username');
         $user->email = $request->input('email');
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $path = $file->store('user', 'public'); // Store in the "storage/app/public/user" directory
+            $user->profile_picture = $path;
+        }
         $user->save();
 
         // Redirect to the user's profile

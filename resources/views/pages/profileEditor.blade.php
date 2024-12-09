@@ -6,9 +6,33 @@
     <section id="profile-container">
         <h2>Edit Profile: {{ $user->username }}</h2>
 
-        <form action="{{ url('/api/users/' . $user->id . '/edit') }}" method="POST">
+        <form action="{{ url('/api/users/' . $user->id . '/edit') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+
+            <div class="profile-picture-container">
+                <img 
+                    id="profile-pic-preview" 
+                    src="{{ $user->getProfilePicture() }}" 
+                    alt="Current Profile Picture" 
+                    class="profile-pic"
+                >
+            </div>
+
+            <!-- Profile Picture Field -->
+            <div class="form-group">
+                <label for="profile_picture">Profile Picture:</label>
+                <input 
+                    type="file" 
+                    id="profile_picture" 
+                    name="profile_picture" 
+                    class="form-control"
+                    accept="image/*"
+                >
+                @error('profile_picture')
+                    <div class="error text-danger">{{ $message }}</div>
+                @enderror
+            </div>
 
             <!-- Username Field -->
             <div>

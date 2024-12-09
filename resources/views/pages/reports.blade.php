@@ -13,7 +13,7 @@
     <section id="categories">
         <h2>Blocked</h2>
         @if ($blocked)
-        <ul>
+        <ul class= "blocked">
             @foreach ($blocked as $user)
                 <li>
                     <a href="{{ route('user.profile', $user->user->id) }}">{{ $user->user->username }}</a>

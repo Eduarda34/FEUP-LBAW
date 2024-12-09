@@ -179,6 +179,18 @@ header .search-bar button {
   gap: 1.5em;
   padding: 1em;
 }
+.blocked {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.blocked li {
+  padding-left: 1rem;
+  text-indent: -0.75rem;
+}
+.blocked li::before {
+  content: '❌ ';
+}
 #content_body > #categories > h2 {
   color: #435c4f;
   border-bottom: 3px solid #d2e2d8;

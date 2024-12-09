@@ -29,6 +29,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'profile_picture'
     ];
 
     /**
@@ -133,5 +134,11 @@ class User extends Authenticatable
      */
     public function blocked(): HasOne {
         return $this->hasOne(BlockedUser::class, 'blocked_id');
+    }
+
+    public function getProfilePicture(): string {
+        return $this->profile_picture 
+            ? asset('storage/' . $this->profile_picture) 
+            : asset('storage/default.png');
     }
 }

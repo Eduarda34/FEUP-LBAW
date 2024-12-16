@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Auth\Access\Response;
 
 class UserPolicy
@@ -93,5 +94,21 @@ class UserPolicy
     public function unfollowCategory(User $user): bool
     {
         return true;
+    }
+
+    /**
+     * Determine whether the user can mark a notification as viewed/not viewed.
+     */
+    public function viewNotification(User $user, Notification $notification): bool
+    {
+        return $user->id === $notification->user_id;
+    }
+
+    /**
+     * Determine whether the user can delete a notification.
+     */
+    public function deleteNotification(User $user, Notification $notification): bool
+    {
+        return $user->id === $notification->user_id;
     }
 }

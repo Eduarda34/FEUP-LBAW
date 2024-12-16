@@ -333,6 +333,26 @@ class CommentController extends Controller
         $reply->save();
         return response()->json($reply);
     }
+    
+    /**
+     * Show the form for reporting the specified comment.
+     */
+    public function showReportForm(int $comment_id)
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get the comment.
+        $comment = Comment::findOrFail($comment_id);
+
+        return view('pages.reportCreator', [ 'comment' => $comment ]);
+    }
 
     /**
      * Report a specific comment.

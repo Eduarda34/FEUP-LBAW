@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Models\PostVote;
 use App\Models\Category;
 use App\Models\BlockedUser;
+use App\Models\Report;
+use App\Models\PostReport;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -522,5 +524,47 @@ class PostController extends Controller
         Auth::user()->favorites()->detach($post_id);
 
         return response()->json(['message' => 'Post removed from favorites successfully.']);
+    }
+
+    /**
+     * Report a specific post.
+     */
+    public function report(Request $request, int $id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Find the post being reported.
+        $reportedPost = Post::findOrFail($id);
+
+        // Prevent reporting oneself.
+        if ($reportedPost->user_id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot report your own post.')->setStatusCode(403);
+        }
+
+        // Validate the request.
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        // Create a new report.
+        $report = new Report();
+        $report->reporter_id = Auth::id();
+        $report->reason = $request->input('reason');
+        $report->save();
+
+        // Add the report to the `post_report` table.
+        $postReport = new PostReport();
+        $postReport->report_id = $report->report_id;
+        $postReport->reported_id = $reportedPost->id;
+        $postReport->save();
+
+        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;
     }
 }

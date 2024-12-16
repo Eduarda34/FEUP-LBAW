@@ -8,10 +8,12 @@ DROP TABLE IF EXISTS blocked_users CASCADE;
 DROP TABLE IF EXISTS comment_report CASCADE;
 DROP TABLE IF EXISTS post_report CASCADE;
 DROP TABLE IF EXISTS user_report CASCADE;
+DROP TABLE IF EXISTS reports CASCADE;
 DROP TABLE IF EXISTS post_notification CASCADE;
 DROP TABLE IF EXISTS comment_notification CASCADE;
 DROP TABLE IF EXISTS vote_notification CASCADE;
 DROP TABLE IF EXISTS follow_notification CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
 DROP TABLE IF EXISTS user_favorites CASCADE;
 DROP TABLE IF EXISTS comment_votes CASCADE;
 DROP TABLE IF EXISTS post_votes CASCADE;
@@ -61,8 +63,10 @@ DROP TRIGGER IF EXISTS no_self_vote_post_trigger ON post_votes CASCADE;
 DROP FUNCTION IF EXISTS no_self_vote_post CASCADE;
 DROP TRIGGER IF EXISTS no_self_vote_comment_trigger ON comment_votes CASCADE;
 DROP FUNCTION IF EXISTS no_self_vote_comment CASCADE;
+DROP TRIGGER IF EXISTS no_self_report_user_trigger ON user_report CASCADE;
+DROP FUNCTION IF EXISTS no_self_report_user CASCADE;
 DROP TRIGGER IF EXISTS no_self_report_post_trigger ON post_report CASCADE;
-DROP FUNCTION IF EXISTS no_self_report_post CASCADE;
+DROP FUNCTION IF EXISTS no_self_report_ CASCADE;
 DROP TRIGGER IF EXISTS no_self_report_comment_trigger ON comment_report CASCADE;
 DROP FUNCTION IF EXISTS no_self_report_comment CASCADE;
 
@@ -170,69 +174,60 @@ CREATE TABLE user_favorites (
 );
 
 -- Notifications tables
-CREATE TABLE follow_notification(
+CREATE TABLE notifications (
     notification_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    follower_id INT REFERENCES users(id) ON DELETE CASCADE,
     viewed BOOLEAN DEFAULT FALSE,
     time TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE follow_notification (
+    notification_id INT PRIMARY KEY REFERENCES notifications(notification_id) ON DELETE CASCADE,
+    follower_id INT REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE vote_notification (
-    notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    notification_id INT PRIMARY KEY REFERENCES notifications(notification_id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
-    comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
-    viewed BOOLEAN DEFAULT FALSE,
-    time TIMESTAMP DEFAULT NOW()
+    comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE
 );
 
 CREATE TABLE comment_notification (
-    notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    notification_id INT PRIMARY KEY REFERENCES notifications(notification_id) ON DELETE CASCADE,
     post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
     parent_comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
-    comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE,
-    viewed BOOLEAN DEFAULT FALSE,
-    time TIMESTAMP DEFAULT NOW()
+    comment_id INT REFERENCES comments(comment_id) ON DELETE CASCADE
 );
 
 CREATE TABLE post_notification (
-    notification_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    notification_id INT PRIMARY KEY REFERENCES notifications(notification_id) ON DELETE CASCADE,
     author_id INT REFERENCES users(id) ON DELETE SET NULL,
-    post_id INT REFERENCES posts(post_id) ON DELETE CASCADE,
-    viewed BOOLEAN DEFAULT FALSE,
-    time TIMESTAMP DEFAULT NOW()
+    post_id INT REFERENCES posts(post_id) ON DELETE CASCADE
 );
 
 -- Reports tables
-CREATE TABLE user_report (
+CREATE TABLE reports (
     report_id SERIAL PRIMARY KEY,
     reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
-    reported_id INT REFERENCES users(id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     time TIMESTAMP DEFAULT NOW(),
     resolved_time TIMESTAMP,
-    CONSTRAINT no_self_report_user CHECK (reporter_id <> reported_id)
+    CONSTRAINT check_report_date CHECK (resolved_time IS NULL OR resolved_time >= time)
+);
+
+CREATE TABLE user_report (
+    report_id INT PRIMARY KEY REFERENCES reports(report_id) ON DELETE CASCADE,
+    reported_id INT REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE post_report (
-    report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
-    post_id INT REFERENCES posts(post_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    time TIMESTAMP DEFAULT NOW(),
-    resolved_time TIMESTAMP
+    report_id INT PRIMARY KEY REFERENCES reports(report_id) ON DELETE CASCADE,
+    post_id INT REFERENCES posts(post_id) ON DELETE SET NULL
 );
 
 CREATE TABLE comment_report (
-    report_id SERIAL PRIMARY KEY,
-    reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
-    comment_id INT REFERENCES comments(comment_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    time TIMESTAMP DEFAULT NOW(),
-    resolved_time TIMESTAMP
+    report_id INT PRIMARY KEY REFERENCES reports(report_id) ON DELETE CASCADE,
+    comment_id INT REFERENCES comments(comment_id) ON DELETE SET NULL
 );
 
 -- Blocked Users table with reason and reference to report leading to block
@@ -240,7 +235,7 @@ CREATE TABLE blocked_users (
     blocked_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     blocked_at TIMESTAMP DEFAULT NOW(),
     reason TEXT,
-    report_id INT REFERENCES user_report(report_id) ON DELETE SET NULL
+    report_id INT REFERENCES reports(report_id) ON DELETE SET NULL
 );
 
 
@@ -338,9 +333,16 @@ EXECUTE PROCEDURE prevent_comment_deletion();
 CREATE FUNCTION create_follow_notification()
 RETURNS TRIGGER AS 
 $BODY$
+    DECLARE
+        new_notification_id INT;
     BEGIN
-        INSERT INTO follow_notification (user_id, follower_id, time)
-        VALUES (NEW.followed_id, NEW.follower_id, NOW());
+        INSERT INTO notifications (user_id)
+        VALUES (NEW.followed_id)
+        RETURNING notification_id INTO new_notification_id;
+
+        INSERT INTO follow_notification (notification_id, follower_id)
+        VALUES (new_notification_id, NEW.follower_id);
+
         RETURN NEW;
     END;
 $BODY$
@@ -356,9 +358,16 @@ EXECUTE PROCEDURE create_follow_notification();
 CREATE FUNCTION create_vote_notification_post()
 RETURNS TRIGGER AS 
 $BODY$
+    DECLARE
+        new_notification_id INT;
     BEGIN
-        INSERT INTO vote_notification (user_id, post_id, time)
-        VALUES ((SELECT user_id FROM posts WHERE post_id = NEW.post_id), NEW.post_id, NOW());
+        INSERT INTO notifications (user_id)
+        VALUES ((SELECT user_id FROM posts WHERE post_id = NEW.post_id))
+        RETURNING notification_id INTO new_notification_id;
+
+        INSERT INTO vote_notification (notification_id, post_id)
+        VALUES (new_notification_id, NEW.post_id);
+
         RETURN NEW;
     END;
 $BODY$ 
@@ -374,9 +383,16 @@ EXECUTE PROCEDURE create_vote_notification_post();
 CREATE FUNCTION create_vote_notification_comment()
 RETURNS TRIGGER AS 
 $BODY$
+    DECLARE
+        new_notification_id INT;
     BEGIN
-        INSERT INTO vote_notification (user_id, comment_id, time)
-        VALUES ((SELECT user_id FROM comments WHERE comment_id = NEW.comment_id), NEW.comment_id, NOW());
+        INSERT INTO notifications (user_id)
+        VALUES ((SELECT user_id FROM comments WHERE comment_id = NEW.comment_id))
+        RETURNING notification_id INTO new_notification_id;
+
+        INSERT INTO vote_notification (notification_id, comment_id)
+        VALUES (new_notification_id, NEW.comment_id);
+
         RETURN NEW;
     END;
 $BODY$ 
@@ -392,9 +408,16 @@ EXECUTE PROCEDURE create_vote_notification_comment();
 CREATE FUNCTION create_comment_notification()
 RETURNS TRIGGER AS 
 $BODY$
+    DECLARE
+        new_notification_id INT;
     BEGIN
-        INSERT INTO comment_notification (user_id, post_id, comment_id, time)
-        VALUES ((SELECT user_id FROM posts WHERE post_id = NEW.post_id), NEW.post_id, NEW.comment_id, NOW());
+        INSERT INTO notifications (user_id)
+        VALUES ((SELECT user_id FROM posts WHERE post_id = NEW.post_id))
+        RETURNING notification_id INTO new_notification_id;
+
+        INSERT INTO comment_notification (notification_id, post_id, comment_id)
+        VALUES (new_notification_id, NEW.post_id, NEW.comment_id);
+
         RETURN NEW;
     END;
 $BODY$ 
@@ -410,9 +433,16 @@ EXECUTE PROCEDURE create_comment_notification();
 CREATE FUNCTION create_reply_notification()
 RETURNS TRIGGER AS 
 $BODY$
+    DECLARE
+        new_notification_id INT;
     BEGIN
-        INSERT INTO comment_notification (user_id, post_id, parent_comment_id, comment_id, time)
-        VALUES ((SELECT user_id FROM comments WHERE comment_id = NEW.parent_comment_id), (SELECT post_id FROM comments WHERE comment_id = NEW.comment_id), NEW.parent_comment_id, NEW.comment_id, NOW());
+        INSERT INTO notifications (user_id)
+        VALUES ((SELECT user_id FROM comments WHERE comment_id = NEW.parent_comment_id))
+        RETURNING notification_id INTO new_notification_id;
+
+        INSERT INTO comment_notification (notification_id, post_id, parent_comment_id, comment_id)
+        VALUES (new_notification_id, (SELECT post_id FROM comments WHERE comment_id = NEW.comment_id), NEW.parent_comment_id, NEW.comment_id);
+
         RETURN NEW;
     END;
 $BODY$ 
@@ -428,11 +458,22 @@ EXECUTE PROCEDURE create_reply_notification();
 CREATE FUNCTION create_post_notification()
 RETURNS TRIGGER AS 
 $BODY$
+    DECLARE
+        new_notification_id INT;
     BEGIN
-        INSERT INTO post_notification (user_id, author_id, post_id, time)
-        SELECT follower_id, NEW.user_id, NEW.post_id, NOW()
-        FROM follows
-        WHERE followed_id = NEW.user_id;
+        FOR new_notification_id IN
+            SELECT follower_id
+            FROM follows
+            WHERE followed_id = NEW.user_id
+        LOOP
+            INSERT INTO notifications (user_id)
+            VALUES (new_notification_id)
+            RETURNING notification_id INTO new_notification_id;
+
+            INSERT INTO post_notification (notification_id, author_id, post_id)
+            VALUES (new_notification_id, NEW.user_id, NEW.post_id);
+        END LOOP;
+
         RETURN NEW;
     END;
 $BODY$ 
@@ -559,12 +600,37 @@ FOR EACH ROW EXECUTE PROCEDURE no_self_vote_comment();
   
 
 -- BR06: A user is unable to report themselves or their own content.
+    -- Users
+CREATE FUNCTION no_self_report_user() 
+RETURNS TRIGGER AS 
+$BODY$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM reports WHERE report_id = NEW.report_id) THEN
+            RAISE EXCEPTION 'Invalid report_id: The report does not exist in the reports table.';
+        END IF;
+        IF (SELECT reporter_id FROM reports WHERE report_id = NEW.report_id) = NEW.reported_id THEN
+            DELETE FROM reports WHERE report_id = NEW.report_id;
+            RAISE EXCEPTION 'User cannot report himself';
+        END IF;
+        RETURN NEW;
+    END;
+$BODY$ 
+LANGUAGE plpgsql;
+
+CREATE TRIGGER no_self_report_user_trigger
+BEFORE INSERT OR UPDATE ON user_report
+FOR EACH ROW EXECUTE PROCEDURE no_self_report_user();
+
     -- Posts
 CREATE FUNCTION no_self_report_post() 
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF NEW.reporter_id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id) THEN
+        IF NOT EXISTS (SELECT 1 FROM reports WHERE report_id = NEW.report_id) THEN
+            RAISE EXCEPTION 'Invalid report_id: The report does not exist in the reports table.';
+        END IF;
+        IF (SELECT reporter_id FROM reports WHERE report_id = NEW.report_id) = (SELECT user_id FROM posts WHERE post_id = NEW.post_id) THEN
+            DELETE FROM reports WHERE report_id = NEW.report_id;
             RAISE EXCEPTION 'User cannot report their own post';
         END IF;
         RETURN NEW;
@@ -581,7 +647,11 @@ CREATE FUNCTION no_self_report_comment()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF NEW.reporter_id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id) THEN
+        IF NOT EXISTS (SELECT 1 FROM reports WHERE report_id = NEW.report_id) THEN
+            RAISE EXCEPTION 'Invalid report_id: The report does not exist in the reports table.';
+        END IF;
+        IF (SELECT reporter_id FROM reports WHERE report_id = NEW.report_id) = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id) THEN
+            DELETE FROM reports WHERE report_id = NEW.report_id;
             RAISE EXCEPTION 'User cannot report their own comment';
         END IF;
         RETURN NEW;
@@ -801,7 +871,7 @@ INSERT INTO post_categories (post_id, category_id) VALUES
     (3, 3);
 
 INSERT INTO comments (post_id, user_id, body, created_at) VALUES 
-    (1, 2, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),
+    (1, 4, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),
     (1, 3, 'Quantum computing has so much potential!', '2024-11-21 19:32:35.42877'),
     (3, 2, 'Very informative, thanks!', '2024-11-21 19:31:35.42877');
 
@@ -820,15 +890,21 @@ INSERT INTO user_favorites (user_id, post_id) VALUES
     (5, 1),
     (2, 3);
 
-INSERT INTO user_report (reporter_id, reported_id, reason, time) VALUES 
-    (5, 2, 'Inappropriate behavior', NOW()),
-    (3, 5, 'Spam content', NOW());
+INSERT INTO reports (reporter_id, reason, time, resolved_time) VALUES 
+    (5, 'Inappropriate behavior', NOW(), NOW()),
+    (3, 'Spam content', NOW(), NULL),
+    (2, 'Inaccurate information', NOW(), NULL),
+    (5, 'Offensive comment', NOW(), NULL);
 
-INSERT INTO post_report (reporter_id, post_id, reason, time) VALUES 
-    (2, 1, 'Inaccurate information', NOW());
+INSERT INTO user_report (report_id, reported_id) VALUES 
+    (1, 2),
+    (2, 5);
 
-INSERT INTO comment_report (reporter_id, comment_id, reason, time) VALUES 
-    (5, 2, 'Offensive comment', NOW());
+INSERT INTO post_report (report_id, post_id) VALUES 
+    (3, 1);
+
+INSERT INTO comment_report (report_id, comment_id) VALUES 
+    (4, 2);
 
 INSERT INTO blocked_users (blocked_id, blocked_at, reason, report_id) VALUES 
     (2, NOW(), 'Repeated violations', 1);

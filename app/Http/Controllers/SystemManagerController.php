@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SystemManager;
+use App\Models\Report;
 use App\Models\UserReport;
 use App\Models\PostReport;
 use App\Models\CommentReport;
@@ -30,13 +31,21 @@ class SystemManagerController extends Controller
                 ->setStatusCode(403);
         }
 
-        $userReports = UserReport::all();
+        /* $userReports = UserReport::all();
         $postReports = PostReport::all();
         $commentReports = CommentReport::all();
 
         $reports = $userReports
             ->concat($postReports)
             ->concat($commentReports)
+            ->sortBy(function ($report) {
+                return [
+                    $report->resolved_time ?? PHP_INT_MIN,
+                    $report->time
+                ];
+            }); */
+
+        $reports = Report::all()
             ->sortBy(function ($report) {
                 return [
                     $report->resolved_time ?? PHP_INT_MIN,
@@ -71,18 +80,7 @@ class SystemManagerController extends Controller
 
         $request->validate([
             'reason' => 'required|string|max:255',
-            'report_id' => [
-                'nullable',
-                function ($attribute, $value, $fail) {
-                    $exists = UserReport::where('report_id', $value)->exists() ||
-                              PostReport::where('report_id', $value)->exists() ||
-                              CommentReport::where('report_id', $value)->exists();
-        
-                    if (!$exists) {
-                        $fail('The selected ' . $attribute . ' is invalid.');
-                    }
-                }
-            ],
+            'report_id' => 'nullable|exists:reports,report_id',
         ]);
 
         $user = User::findOrFail($id);
@@ -156,9 +154,7 @@ class SystemManagerController extends Controller
         }
 
         // Find the report (check all report tables).
-        $report = UserReport::find($report_id)
-            ?? PostReport::find($report_id)
-            ?? CommentReport::find($report_id);
+        $report = Report::find($report_id);
 
         if (!$report) {
             return redirect()->back()

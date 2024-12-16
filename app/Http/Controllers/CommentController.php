@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\CommentVote;
+use App\Models\Report;
+use App\Models\CommentReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -330,5 +332,48 @@ class CommentController extends Controller
         // Save the comment and return it as JSON.
         $reply->save();
         return response()->json($reply);
+    }
+
+    /**
+     * Report a specific comment.
+     */
+    public function report(Request $request, int $id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Find the comment being reported.
+        $reportedComment = Comment::findOrFail($id);
+
+        // Prevent reporting oneself.
+        if ($reportedComment->user_id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot report your own comment.')->setStatusCode(403);
+        }
+
+        // Validate the request.
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        // Create a new report.
+        $report = new Report();
+        $report->reporter_id = Auth::id();
+        $report->reason = $request->input('reason');
+        $report->comment = $reportedComment
+        $report->save();
+
+        // Add the report to the `post_report` table.
+        /* $postReport = new PostReport();
+        $postReport->report_id = $report->report_id;
+        $postReport->reported_id = $reportedComment->id;
+        $postReport->save(); */
+
+        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;
     }
 }

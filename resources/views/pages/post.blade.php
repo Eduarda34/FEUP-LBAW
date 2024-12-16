@@ -51,6 +51,9 @@
                 <div class="comments-section">
                     <h3>Comments</h3>
                     @foreach ($post->comments as $comment)
+                        @if ($comment->parent)
+                            @continue
+                        @endif
                         <div class="comment">
                             <!-- Comment Header -->
                             <p>
@@ -73,6 +76,9 @@
                                     </span>
                                     <span class="comment-votes">
                                         <span class="vote-icon">&#8595;</span> {{ $comment->votes()->where('is_like', false)->count() }}
+                                    </span>
+                                    <span class="comment-votes">
+                                        <span class="vote-icon">&#128172;</span> <span>{{$comment->replies()->count()}}</span>
                                     </span>
                                 </div>
                             </div>

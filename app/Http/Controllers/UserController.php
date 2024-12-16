@@ -298,9 +298,6 @@ class UserController extends Controller
             return redirect('/logout');
         }
 
-        // Authorize viewing notifications.
-        $this->authorize('showNotifications', Notification::class);
-
         // Sort by most recent.
         $notifications = Auth::user()->notifications()->orderBy('time', 'desc')->get();
 

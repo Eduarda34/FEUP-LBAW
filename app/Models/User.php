@@ -29,6 +29,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'profile_picture'
     ];
 
     /**
@@ -103,8 +104,8 @@ class User extends Authenticatable
     /**
      * Get the user reports submitted by the user.
      */
-    public function user_reporter(): HasMany {
-        return $this->hasMany(UserReport::class, 'reporter_id');
+    public function reports(): HasMany {
+        return $this->hasMany(Report::class, 'reporter_id');
     }
 
     /**
@@ -115,23 +116,25 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the post reports submitted by the user.
-     */
-    public function post_reporter(): HasMany {
-        return $this->hasMany(PostReport::class, 'reporter_id');
-    }
-
-    /**
-     * Get the comment reports submitted by the user.
-     */
-    public function comment_reporter(): HasMany {
-        return $this->hasMany(CommentReport::class, 'reporter_id');
-    }
-
-    /**
      * Get the blocked user for a user.
      */
     public function blocked(): HasOne {
         return $this->hasOne(BlockedUser::class, 'blocked_id');
+    }
+
+    /**
+     * Get the user notifications.
+     */
+    public function notifications(): HasMany {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    /**
+     * Get the user profile picture.
+     */
+    public function getProfilePicture(): string {
+        return $this->profile_picture 
+            ? asset('storage/' . $this->profile_picture) 
+            : asset('storage/default.png');
     }
 }

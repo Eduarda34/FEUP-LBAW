@@ -607,3 +607,20 @@ input::placeholder, textarea::placeholder {
   color: #ffffff; 
   font-style: normal;
 }  
+
+.profile-pic {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit:cover;
+  border: 10px solid #7c9987;
+  object-position:center;
+  background-color: #f0f0f0;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-picture-container {
+  position: relative;
+  display: inline-block;
+}

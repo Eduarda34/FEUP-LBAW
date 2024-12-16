@@ -7,10 +7,10 @@
             </a>
         </p>
         <p>Reported at: {{ \Carbon\Carbon::parse($report->time)->format('d/m/Y H:i') }}</p>
-        @if (isset($report->reported))
+        @if (isset($report->user))
             <p>Reported User: 
-                <a href="{{ route('user.profile', $report->reported->id) }}">
-                    {{ $report->reported->username }}
+                <a href="{{ route('user.profile', $report->user->reported->id) }}">
+                    {{ $report->user->reported->username }}
                 </a>
             </p>
         @endif
@@ -23,7 +23,7 @@
         @endif
         @if (isset($report->comment))
             <p>Comment: 
-                <a href="{{ route('posts.show', $report->comment->post_id) }}">
+                <a href="{{ route('posts.show', $report->comment->comment->post_id) }}">
                     [View Comment]
                 </a>
             </p>

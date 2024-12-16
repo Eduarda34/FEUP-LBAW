@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Report;
+use App\Models\UserReport;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -92,11 +94,17 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|max:50|unique:users,username,' . $user->id,
             'email' => 'required|email|max:250|unique:users,email,' . $user->id,
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         // Update the user's information
         $user->username = $request->input('username');
         $user->email = $request->input('email');
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $path = $file->store('user', 'public'); // Store in the "storage/app/public/user" directory
+            $user->profile_picture = $path;
+        }
         $user->save();
 
         // Redirect to the user's profile
@@ -232,5 +240,73 @@ class UserController extends Controller
         if ($isFollowed) {
             Auth::user()->followed_categories()->attach($category->category_id);
         }
+    }
+
+    /**
+     * Report a specific user.
+     */
+    public function report(Request $request, int $id) 
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Find the user being reported.
+        $reportedUser = User::findOrFail($id);
+
+        // Prevent reporting oneself.
+        if ($reportedUser->id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot report yourself.')->setStatusCode(403);
+        }
+
+        // Validate the request.
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        // Create a new report.
+        $report = new Report();
+        $report->reporter_id = Auth::id();
+        $report->reason = $request->input('reason');
+        $report->save();
+
+        // Add the report to the `user_report` table.
+        $userReport = new UserReport();
+        $userReport->report_id = $report->report_id;
+        $userReport->reported_id = $reportedUser->id;
+        $userReport->save();
+
+        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;
+    }
+
+    /**
+     * Display a listing of the user notifications.
+     */
+    public function showNotifications(Request $request)
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Authorize viewing notifications.
+        $this->authorize('showNotifications', Notification::class);
+
+        // Sort by most recent.
+        $notifications = Auth::user()->notifications()->orderBy('time', 'desc')->get();
+
+        // Render the notifications view.
+        return view('pages.notifications', [
+            'notifications' => $notifications,
+        ]);
     }
 }

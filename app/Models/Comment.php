@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Comment extends Model
 {
@@ -31,15 +32,15 @@ class Comment extends Model
     /**
      * Get the comment that the reply belongs.
      */
-    public function parent(): BelongsTo  {
-        return $this->belongsTo(Comment::class, 'replies', 'comment_id', 'parent_comment_id');
+    public function parent(): HasOne  {
+        return $this->hasOne(Reply::class, 'comment_id', 'comment_id')->with('parent');
     }
 
     /**
      * Get the replies for the comment.
      */
     public function replies(): HasMany  {
-        return $this->hasMany(Comment::class, 'replies', 'parent_comment_id', 'comment_id');
+        return $this->hasMany(Reply::class, 'parent_comment_id', 'comment_id')->with('reply');
     }
 
     /**

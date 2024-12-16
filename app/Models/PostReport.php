@@ -18,10 +18,10 @@ class PostReport extends Model
     protected $primaryKey = 'report_id';
 
     /**
-     * Reporter relationship.
+     * Report relationship.
      */
-    public function reporter(): BelongsTo {
-        return $this->belongsTo(User::class, 'reporter_id');
+    public function report(): BelongsTo {
+        return $this->belongsTo(Report::class, 'report_id');
     }
 
     /**

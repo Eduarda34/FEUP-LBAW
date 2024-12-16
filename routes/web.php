@@ -70,6 +70,10 @@ Route::controller(UserController::class)->group(function () {
     Route::post('/api/users/{id}/follow', 'follow');
     Route::delete('/api/users/{id}/unfollow', 'unfollow');
     Route::post('api/users/{id}/report', 'report');
+    Route::put('api/users/notifications/{notification_id}', 'viewNotification');
+    Route::delete('api/users/notifications/{notification_id}', 'deleteNotification');
+    Route::put('api/users/notifications', 'viewAllNotifications');
+    Route::delete('api/users/notifications', 'deleteAllNotifications');
 });
 
 // Posts

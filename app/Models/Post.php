@@ -27,7 +27,8 @@ class Post extends Model
      */
     public function comments(): HasMany  {
         return $this->hasMany(Comment::class, 'post_id', 'post_id')
-            ->whereNotIn('user_id', BlockedUser::query()->select('blocked_id'));
+            ->whereNotIn('user_id', BlockedUser::query()->select('blocked_id'))
+            ->whereNotIn('comment_id', Reply::query()->select('comment_id'));
     }
 
     /**

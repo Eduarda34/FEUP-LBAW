@@ -365,7 +365,7 @@ class CommentController extends Controller
         $report = new Report();
         $report->reporter_id = Auth::id();
         $report->reason = $request->input('reason');
-        $report->comment = $reportedComment
+        $report->comment = $reportedComment;
         $report->save();
 
         // Add the report to the `post_report` table.

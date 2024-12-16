@@ -27,7 +27,13 @@
                     <h1><a href="{{ url('/posts') }}">NewsNet</a></h1>
                 </div>
                 <nav>
-                @if (Auth::check())
+                    <div class='about'>
+                        <a href="/about">About</a>
+                    </div>
+                    <div class='contacts'>
+                        <a href="/contacts">Contacts</a>
+                    </div>
+                    @if (Auth::check())
                         <!-- User Dropdown -->
                         <div class="dropdown">
                             <a class="button dropbtn">{{ Auth::user()->username }}</a>

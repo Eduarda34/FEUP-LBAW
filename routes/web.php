@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Auth\ViewNewController;
 
+use App\Http\Controllers\StaticPageController;
+
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
@@ -45,9 +47,10 @@ Route::controller(RegisterController::class)->group(function () {
 });
 
 // Static Pages
-/* Route::controller(StaticPageController::class)->group(function () {
-    Route::get('/about', 'showAboutPage').>name('about');
-}); */
+Route::controller(StaticPageController::class)->group(function () {
+    Route::get('/about', 'showAboutPage')->name('about');
+    Route::get('/contacts', 'showContactsPage')->name('contacts');
+});
 
 // Users
 Route::controller(UserController::class)->group(function () {

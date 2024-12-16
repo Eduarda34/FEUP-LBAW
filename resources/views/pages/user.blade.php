@@ -14,14 +14,14 @@
             <p>Followers: {{ $user->followers }}</p>
             <p>Following: {{ $user->following }}</p>
             <p>Reputation: {{$user->reputation }}</p>
-        </div>
-    </section>
 
-    <!-- Search Bar Section -->
-    <section id="search-bar">
-        <form action="{{ route('search.users') }}" method="GET" >
-            <input type="text" name="query" placeholder="Search users..." required>
-            <button type="submit">Search</button>
-        </form>
+            <h2>Who is Admin?</h2>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed volutpat purus. 
+                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                Nam feugiat, mauris sodales sagittis semper, eros velit aliquam lacus, non luctus ligula nisi in mi.
+            </p>
+            
+        </div>
     </section>
 @endsection

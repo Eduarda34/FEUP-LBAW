@@ -525,6 +525,26 @@ class PostController extends Controller
 
         return response()->json(['message' => 'Post removed from favorites successfully.']);
     }
+    
+    /**
+     * Show the form for reporting the specified post.
+     */
+    public function showReportForm(int $post_id)
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get the post.
+        $post = Post::findOrFail($post_id);
+
+        return view('pages.reportCreator', [ 'post' => $post ]);
+    }
 
     /**
      * Report a specific post.

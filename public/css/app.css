@@ -194,34 +194,42 @@ h3 {
   font-weight: normal;
 }
 
-#content > .profile-container {
+#profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    color: #394E47; /* Cor base do texto */
+    margin: 20px auto;
+    max-width: 800px;
+    padding: 20px;
+}
+
+#profile-container h2 {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.profile-info {
   display: flex;
+  gap: 20px; 
   align-items: flex-start;
-  width: 80%;
-  max-width: 800px;
-  margin: 30px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  grid-template-columns: 1fr auto auto;
-  justify-content: space-between;
-  margin: 1em;
-  position: relative;
-  font-family: Arial, sans-serif;
+  width: 100%;
 }
 
-#content > #profile-container h2 {
-  color: #2c3e50;
-  margin-bottom: 15px;
-  font-size: 1.8em;
-  text-align: center;
-}
-
-#content > #profile-container > #profile-info > h2 {
-  font-size: 1.5em;
-  margin: 0;
+.profile-info a {
   font-weight: bold;
-  text-transform: uppercase;
+  color: #6A837B;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.profile-info a:hover {
+  color: black;
 }
 
 #content > #profile-container form {
@@ -378,19 +386,21 @@ input[type=password]:focus {
     transition: transform 0.2s ease;
 }
 
-.profile-info > p {
-  line-height: 1.6;
-  font-size: 1em;
-  max-width: 500px; 
-  margin: 1rem;
-  padding-left: 20px;
+.profile-info p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: black;
+    line-height: 1.6;
 }
 
-.profile-info .edit-small {
-  font-size: 0.8em;
-  margin-top: 10px;
-  color: #6A837B;
-  text-decoration: none;
+.profile-info p:last-child {
+  margin-bottom: 0;
+}
+
+.profile-info h2 {
+  font-size: 1.5em;
+  margin-top: 20px;
+  color: black;
 }
 
 #post {
@@ -690,23 +700,13 @@ input::placeholder, textarea::placeholder {
   font-style: normal;
 }  
 
-.profile-picture-container {
-  text-align: center;
-  margin-bottom: 20px;
-  position: relative;
-  display: inline-block;
-}
 
 .profile-pic {
-  width: 150px;
+  width: 150px; 
   height: 150px;
-  border-radius: 50%;
-  object-fit:cover;
-  border: 2px solid #7c9987;
-  object-position:center;
-  background-color: #f0f0f0;
-  padding: 0;
-  margin: 0;
+  object-fit: cover;
+  border-radius: 50%; 
+  border: 4px solid #6A837B; 
 }
 
 #container > .edit-link {

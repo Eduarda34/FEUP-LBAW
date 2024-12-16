@@ -8,6 +8,8 @@
 
         <div class="profile-info">
             <img src="{{ $user->getProfilePicture() }}" alt="Profile Picture" class="profile-pic">
+
+            <!--User information-->
             @if (Auth::check() && Auth::id() === $user->id)
                 <p>{{ $user->username}} <a href="/users/{{ $user->id }}/edit">[edit]</a></p>
             @endif

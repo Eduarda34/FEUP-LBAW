@@ -36,14 +36,16 @@ body {
 
 nav {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 1em;
   color: #005237;
   padding: 0;
   font: inherit;
   font-weight: bold;
   text-transform: uppercase;
 }
+
 main > header a.button:hover {
     background: none;
     color: #4c8c4a;
@@ -156,6 +158,38 @@ header .search-bar button {
   grid-template-columns: 3fr 1fr;
   margin-left: 1em;
 }
+
+h3 {
+  font-size: larger;
+  padding-left: 2em;
+}
+
+#contacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 3em;
+  margin: 2em;
+  margin-top: 1em;
+}
+
+.contact-information {
+  text-align: center;
+  background-color: #d2e2d8;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: #4b765b;
+}
+
+.contact-information h3 {
+  padding: 8px;
+  margin: 2px;
+}
+
+.contact-information p {
+  font: inherit;
+  margin-bottom: 1em;
+}
+
 #content label {
   font-weight: normal;
 }
@@ -263,10 +297,6 @@ input[type=text]:focus,
 input[type=email]:focus,
 input[type=password]:focus {
   border-color: #81b294;
-}
-.dropdown {
-  position: relative;
-  display: inline-block;
 }
 
 .dropdown-content {

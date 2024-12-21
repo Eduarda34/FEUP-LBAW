@@ -129,6 +129,15 @@ class PostController extends Controller
         return view('pages.postCreator', compact('categories'));
     }
 
+    /**
+     * Extract the first sentence from a given text.
+     */
+    private function extractFirstSentence(string $text): string
+    {
+        // Use a period, question mark, or exclamation mark as the sentence delimiter.
+        $sentences = preg_split('/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|!)\s/', $text, 2);
+        return $sentences[0] ?? $text; // Return the first sentence or the full text if no delimiters found.
+    }
 
     /**
      * Create a new resource.
@@ -152,22 +161,32 @@ class PostController extends Controller
 
         $request->validate([
             'title' => 'required|unique:posts|max:255',
-            'body' => 'required',
+            'synopsis' => 'nullable|string|max:300',
+            'body' => 'required|string|max:10000',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,category_id'
+            'categories.*' => 'exists:categories,category_id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
         
         // Set post details.
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->user_id = Auth::user()->id;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('post', 'public'); // Store in the "storage/app/public/post" directory
+            $post->image = $path;
+        }
 
-        // Save the post and return it as JSON.
+        // Use the provided synopsis or the first sentence of the body.
+        $post->synopsis = $request->input('synopsis') ?? $this->extractFirstSentence($request->input('body'));
+
+        // Save the post and redirect.
         $post->timestamps = false; // Disable timestamps temporarily
         $post->save();
         $post->timestamps = true;
         $post->categories()->attach($request->input('categories'));
-        return redirect('posts/'.$post->post_id);
+        return redirect('posts/'.$post->post_id)->with('success', 'Redirect after creating new post.')->setStatusCode(302);
     }
 
     /**
@@ -184,9 +203,6 @@ class PostController extends Controller
 
         // Get the post.
         $post = Post::findOrFail($post_id);
-
-        // Check if the current user can see (show) the post.
-        $this->authorize('show', $post);  
 
         // Use the pages.post template to display the post.
         return view('pages.post', [
@@ -223,7 +239,8 @@ class PostController extends Controller
             'old' => [
                 'title' => $post->title,
                 'body' => $post->body,
-                'categories' => $post->categories
+                'categories' => $post->categories,
+                'image' => $post->image
             ] 
         ]);
     }
@@ -248,18 +265,27 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         $request->validate([
-            'title' => 'required|string|max:50',
+            'title' => 'required|string|max:255',
+            'synopsis' => 'nullable|string|max:300',
             'body' => 'required|string|max:10000',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,category_id'
+            'categories.*' => 'exists:categories,category_id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('post', 'public'); // Store in the "storage/app/public/post" directory
+            $post->image = $path;
+        }
+        // Use the provided synopsis or the first sentence of the body.
+        $post->synopsis = $request->input('synopsis') ?? $this->extractFirstSentence($request->input('body'));
 
         $post->save();
         $post->categories()->sync($request->input('categories'));
-        return redirect('posts/'.$post->post_id);
+        return redirect('posts/'.$post->post_id)->with('success', 'Post updated successfully!')->setStatusCode(200);
     }
 
     /**

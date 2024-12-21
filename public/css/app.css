@@ -238,7 +238,7 @@ h3 {
   gap: 15px;
 }
 
-.form-group, #profile-container div {
+.image-form, #profile-container div {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -712,5 +712,42 @@ input::placeholder, textarea::placeholder {
 
 .user-details {
   flex: 1;
+}
+
+.news-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.news-image {
+  width: 100%;
+  display: block;
+  padding: 3px;
+  border: 3px solid #6A837B;
+}
+
+.image-preview {
+  max-width: 100%;
+  display: none; /* Hidden initially */
+  padding: 3px;
+  border: 3px solid #6A837B;
+}
+
+.updated-image-preview {
+  max-width: 100%;
+  display: block;
+  padding: 3px;
+  border: 3px solid #6A837B;
+}
+
+.image-form {
+  margin-bottom: 15px;
+}
+
+.error {
+  font-size: 0.9em;
+  color: red;
 }
 

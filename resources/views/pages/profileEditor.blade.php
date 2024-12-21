@@ -20,7 +20,7 @@
             </div>
 
             <!-- Profile Picture Field -->
-            <div class="form-group">
+            <div class="image-form">
                 <label for="profile_picture">Profile Picture:</label>
                 <input 
                     type="file" 

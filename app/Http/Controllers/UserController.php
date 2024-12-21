@@ -7,6 +7,8 @@ use App\Models\Category;
 use App\Models\Report;
 use App\Models\UserReport;
 use App\Models\Notification;
+use App\Models\BlockedUser;
+use App\Models\SystemManager;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +43,34 @@ class UserController extends Controller
             'posts' => $posts, 
             'following' => $following, 
             'followers' => $followers
+        ]);
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function list(Request $request)
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+        
+        $users = User::whereNotIn('id', BlockedUser::query()->select('blocked_id'))
+            ->whereNotIn('id', SystemManager::query()->select('sm_id'))
+            ->orderBy('reputation', 'desc')
+            ->get();
+
+        $post_controller = new PostController();
+
+        // Render the users view.
+        return view('pages.users', [
+            'users' => $users,
+            'suggested_news' => $post_controller->getPopularPosts(),
         ]);
     }
 

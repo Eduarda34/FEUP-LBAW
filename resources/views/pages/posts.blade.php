@@ -4,10 +4,13 @@
 
 @section('content')
 
-<h2>TRENDING NEWS</h2>
 <section id="content_body">
-    <section id="cards">
-        @each('partials.post', $posts, 'post')
+    <section id="posts" class="left-panel">
+        @if ($feedType == 'category')
+            <h2>{{ $category->name }}</h2>
+        @else
+            <h2>TRENDING NEWS</h2>
+        @endif
 
         @if (Auth::check())
             <!-- Button to link to the create post page -->
@@ -15,12 +18,20 @@
                 <a href="{{ url('/posts/create') }}" class="button">Create Post</a>
             </div>
         @endif
+
+        @each('partials.post', $posts, 'post')
     </section>
 
-    <section id="categories">
-        <h2>Categories</h2>
-        <!-- Category content here -->
-        
+    <section id="categories" class="right-panel">
+        <!-- Button to link to the users page -->
+        <div class="meet-authors-btn">
+            <a href="{{ route('users.list') }}" class="button">MEET NEW AUTHORS</a>
+        </div>
+
+        <h3>Categories</h3>
+        @foreach ($categories as $category)
+            <p><a href="{{ route('posts.category', $category->category_id)}}">{{$category->name}}</a></p>
+        @endforeach
     </section>
 </section>
 

@@ -51,9 +51,6 @@ class PostController extends Controller
             $feedType = $request->query('feed', 'recent');
         }
 
-        // Authorize viewing posts.
-        $this->authorize('list', Post::class);
-
         // Fetch posts based on the feed type.
         switch ($feedType) {
             case 'popular':
@@ -71,10 +68,13 @@ class PostController extends Controller
                 break;
         }
 
+        $categories = Category::all();
+
         // Render the posts view.
         return view('pages.posts', [
             'posts' => $posts,
             'feedType' => $feedType,
+            'categories' => $categories,
         ]);
     }
 
@@ -92,18 +92,18 @@ class PostController extends Controller
 
         // Get category
         $category = Category::findOrFail($category_id);
+
+        $categories = Category::all();
         
         // Get all posts from the category.
         $posts = $category->posts()->orderBy('post_id', 'desc')->get();
 
-        // Check if the current user can list the posts.
-        $this->authorize('listByCategory', Post::class);
-
-        // The current user is authorized to list posts.
-
         // Use the pages.posts template to display all posts.
         return view('pages.posts', [
-            'posts' => $posts
+            'posts' => $posts,
+            'feedType' => 'category',
+            'category' => $category,
+            'categories' => $categories,
         ]);
     }
 
@@ -134,9 +134,8 @@ class PostController extends Controller
      */
     private function extractFirstSentence(string $text): string
     {
-        // Use a period, question mark, or exclamation mark as the sentence delimiter.
         $sentences = preg_split('/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|!)\s/', $text, 2);
-        return $sentences[0] ?? $text; // Return the first sentence or the full text if no delimiters found.
+        return $sentences[0] ?? $text;
     }
 
     /**

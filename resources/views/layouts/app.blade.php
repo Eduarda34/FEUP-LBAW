@@ -45,6 +45,10 @@
                                 <a href="{{ url('/logout') }}">Logout</a>
                             </div>
                         </div>
+                    @else
+                        <div class='login'>
+                            <a href="/login">Login</a>
+                        </div>
                     @endif
                 </nav>
             </header>

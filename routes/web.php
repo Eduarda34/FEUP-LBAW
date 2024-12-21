@@ -54,7 +54,7 @@ Route::controller(StaticPageController::class)->group(function () {
 
 // Users
 Route::controller(UserController::class)->group(function () {
-    Route::get('/users', 'list');
+    Route::get('/users', 'list')->name('users.list');
     Route::get('/users/categories', 'listCategories');
     Route::get('/users/notifications', 'showNotifications');
     Route::get('/users/{id}', 'show')->name('user.profile');

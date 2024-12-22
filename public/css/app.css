@@ -84,6 +84,14 @@ nav {
   transition: transform 0.2s ease;
 }
 
+.bell-icon {
+   filter: invert(15%) sepia(80%) saturate(108%) hue-rotate(127deg) brightness(40%) contrast(92%);
+}
+
+.bell-icon:hover {
+   filter: invert(15%) sepia(80%) saturate(108%) hue-rotate(80deg) brightness(70%) contrast(122%);
+}
+
 main > header a.button:hover {
     background: none;
     color: #4c8c4a;
@@ -172,13 +180,13 @@ header .search-bar button {
 
 /*------------------------ {FOOTER} ------------------------*/
 
-footer {
+main > footer {
   text-align: center;
   padding: 3px;
   color: #435c4f;
 }
 
-footer p {
+main > footer p {
   margin-bottom: 3px;
 }
 
@@ -186,11 +194,12 @@ footer p {
 
 #posts {
   display: grid;
+  padding-top: 1em;
 }
 #posts h2 {
   text-transform: uppercase;
   margin-left: 1em;
-  padding-top: 1em;
+  margin-bottom: 0;
   color: #005237;
 }
 #posts article.post {
@@ -262,6 +271,52 @@ article.post footer .vote-icon {
   text-align: center;
   padding: 10px;
   font-size: larger;
+}
+
+.btn {
+  background-color: #ffffff;
+  border: 5px solid #435c4f;
+  text-transform: uppercase;
+  color: #435c4f;
+  padding: 5px;
+  margin: 0;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  width: fit-content;
+  height: fit-content;
+}
+.btn:hover {
+  background-color: #435c4f;
+  border-color: #435c4f;
+  color: white;
+  cursor: pointer;
+}
+
+.btn.inverted {
+  background-color: #435c4f;
+  border-color: #435c4f;
+  color: white;
+}
+.btn.inverted:hover {
+  background-color: #ffffff;
+  border-color: #435c4f;
+  color: #435c4f;
+}
+
+#posts #category-title {
+  display: flex;
+  align-items: center;
+  justify-content:flex-start;
+  padding: 0;
+  margin: 0;
+  gap: 20px;
+}
+
+#follow-btn {
+  font-size: x-small;
+  font-weight:800;
+  min-width:9em;
 }
 
 #login {

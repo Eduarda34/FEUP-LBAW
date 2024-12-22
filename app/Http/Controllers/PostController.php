@@ -202,11 +202,18 @@ class PostController extends Controller
 
         // Get the post.
         $post = Post::findOrFail($post_id);
+        if ($post->owner->blocked) {
+            return abort(403, 'Post unavailable.');
+        }
+
+        $suggestedNews = $this->getPopularPosts()->reject(function ($news) use ($post_id) {
+            return $news->id === $post_id;
+        });
 
         // Use the pages.post template to display the post.
         return view('pages.post', [
             'post' => $post,
-            'suggested_news' => $this->getPopularPosts(),
+            'suggested_news' => $suggestedNews,
         ]);
     }
 
@@ -514,7 +521,8 @@ class PostController extends Controller
 
         // Use the pages.posts template to display all posts.
         return view('pages.posts', [
-            'posts' => $posts
+            'posts' => $posts,
+            'feedType' => 'favorites'
         ]);
     }
 
@@ -538,14 +546,16 @@ class PostController extends Controller
         $post = Post::findOrFail($post_id);
 
         // Check if the post is already in the user's favorites.
-        if (Auth::user()->favorites()->where('post_id', $post_id)->exists()) {
+        if (Auth::user()->favorites()->where('user_favorites.post_id', $post_id)->exists()) {
             return response()->json(['message' => 'This post is already in your favorites.'], 400);
         }
 
         // Add the post to the user's favorites.
         Auth::user()->favorites()->attach($post_id);
 
-        return response()->json(['message' => 'Post added to favorites successfully.']);
+        return response()->json([
+            'post_id' => $post_id,
+        ], 201);
     }
 
     /**
@@ -568,14 +578,16 @@ class PostController extends Controller
         $post = Post::findOrFail($post_id);
 
         // Check if the post is already in the user's favorites.
-        if (!Auth::user()->favorites()->where('post_id', $post_id)->exists()) {
+        if (!Auth::user()->favorites()->where('user_favorites.post_id', $post_id)->exists()) {
             return response()->json(['message' => 'This post is not in your favorites.'], 400);
         }
 
         // Add the post to the user's favorites.
         Auth::user()->favorites()->detach($post_id);
 
-        return response()->json(['message' => 'Post removed from favorites successfully.']);
+        return response()->json([
+            'post_id' => $post_id
+        ], 200);
     }
     
     /**

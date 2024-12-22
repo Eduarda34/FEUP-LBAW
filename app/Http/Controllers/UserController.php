@@ -223,7 +223,7 @@ class UserController extends Controller
     /**
      * Follow a specific category.
      */
-    public function followCategory(Request $request, int $category_id) 
+    public function followCategory(int $category_id) 
     {
         if (!Auth::check()) {
             // Not logged in, redirect to login.
@@ -245,12 +245,16 @@ class UserController extends Controller
         if (!$isFollowed) {
             Auth::user()->followed_categories()->attach($category->category_id);
         }
+
+        return response()->json([
+            'category_id' => $category_id,
+        ], 201);
     }
 
     /**
      * Unfollow a specific category.
      */
-    public function unfollowCategory(Request $request, int $category_id) 
+    public function unfollowCategory(int $category_id) 
     {
         if (!Auth::check()) {
             // Not logged in, redirect to login.
@@ -270,8 +274,12 @@ class UserController extends Controller
         $isFollowed = $category->users()->where('user_id', Auth::user()->id)->exists();
 
         if ($isFollowed) {
-            Auth::user()->followed_categories()->attach($category->category_id);
+            Auth::user()->followed_categories()->detach($category->category_id);
         }
+
+        return response()->json([
+            'category_id' => $category_id,
+        ], 200);
     }
 
     /**

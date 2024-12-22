@@ -56,7 +56,7 @@
                     <option value="{{ $category->category_id }}">{{ $category->name }}</option> <!-- Ensure this matches the column in your DB -->
                 @endforeach
             </select>
-            <small class="form-text text-muted">Hold Ctrl (Cmd on Mac) to select multiple categories.</small>
+            <small class="form-text text-muted">Hold Ctrl (Cmd on Mac) to select or unselect multiple categories.</small>
         </div>
 
         <!-- Submit Button -->

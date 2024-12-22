@@ -56,7 +56,7 @@ Route::controller(StaticPageController::class)->group(function () {
 Route::controller(UserController::class)->group(function () {
     Route::get('/users', 'list')->name('users.list');
     Route::get('/users/categories', 'listCategories');
-    Route::get('/users/notifications', 'showNotifications');
+    Route::get('/users/notifications', 'showNotifications')->name('user.notifications');
     Route::get('/users/{id}', 'show')->name('user.profile');
     Route::get('/users/{id}/edit', 'showProfileEditorForm');
     Route::get('/users/{id}/followers', 'showFollowers');

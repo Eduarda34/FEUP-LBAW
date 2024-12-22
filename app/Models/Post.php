@@ -39,7 +39,7 @@ class Post extends Model
     }
 
     /**
-     * Get the users that added to their favorites a post.
+     * Get the users that added a post to their favorites.
      */
     public function fans(): BelongsToMany {
         return $this->belongsToMany(User::class, 'user_favorites', 'post_id', 'user_id');

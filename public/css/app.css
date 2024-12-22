@@ -170,7 +170,20 @@ header .search-bar button {
   color: #064f36;
 }
 
+/*------------------------ {FOOTER} ------------------------*/
+
+footer {
+  text-align: center;
+  padding: 3px;
+  color: #435c4f;
+}
+
+footer p {
+  margin-bottom: 3px;
+}
+
 /*------------------------ {POSTS LIST} ------------------------*/
+
 #posts {
   display: grid;
 }
@@ -482,6 +495,7 @@ input[type=password]:focus {
 
 
 /*------------------------ {POST PAGE} ------------------------*/
+
 #post {
   display: grid;
   padding: 1em;
@@ -664,6 +678,7 @@ input[type=password]:focus {
 }
 
 /*------------------------ {SUGGESTED NEWS PANEL} ------------------------*/
+
 #suggested-news #suggested-item {
   margin-bottom: 20px;
 }
@@ -807,6 +822,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /*------------------------ {IMAGE} ------------------------*/
+
 .profile-pic {
   width: 200px; 
   height: 200px;
@@ -855,6 +871,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /*------------------------ {USERS LIST} ------------------------*/
+
 #trending-authors h2 {
   text-transform: uppercase;
   margin-left: 1em;
@@ -877,6 +894,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /*------------------------ {DELETE ACCOUNT} ------------------------*/
+
 .delete-account-form {
   background-color: #f8f9fa;
   border: 1px solid #ddd;

@@ -88,6 +88,11 @@
             <section id="content">
                 @yield('content')
             </section>
+
+            <!-- Footer Section -->
+            <footer>
+                <p>© 2024 NEWSNET LBAW2484 COMPANY</p>
+            </footer>
         </main>
     </body>
 </html>

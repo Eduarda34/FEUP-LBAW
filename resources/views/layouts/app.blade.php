@@ -33,6 +33,11 @@
                     <div class='contacts'>
                         <a href="/contacts">Contacts</a>
                     </div>
+                    <div class="notifications">
+                        <a href="/users/notifications" class="bell-icon" title="Notifications">
+                            &#128276; <!-- Unicode bell character -->
+                        </a>
+                    </div>
                     @if (Auth::check())
                         <!-- User Dropdown -->
                         <div class="dropdown">

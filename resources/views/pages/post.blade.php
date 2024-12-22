@@ -49,6 +49,24 @@
                 </div>
             </div>
         </footer>
+
+        @if (Auth::check() && Auth::id() === $post->user_id)
+            <button class="delete-post-btn">Delete Post</button>
+
+            <div class="delete-modal" style="display: none;">
+                <h3 class="delete-modal-title">Delete Post</h3>
+                <p class="delete-modal-message">Are you sure you want to delete this post? This action cannot be undone.</p>
+                <div class="delete-modal-actions">
+                    <button class="delete-modal-cancel">Cancel</button>
+                    <button class="delete-post-btn">Delete</button>
+                </div>
+            </div>
+
+            <div class="delete-error" style="display: none;">
+                The post cannot be deleted because it has associated votes or comments.
+            </div>
+        @endif
+
         <section class="comment-section">
             <h3>Comments</h3>
             @foreach ($post->comments as $comment)
@@ -91,7 +109,7 @@
                             <span class="vote-icon">&#128172;</span> <span>{{$comment->replies()->count()}}</span>
                         </div>
                     </footer>
-                </div>
+
             @endforeach
         </section>
 

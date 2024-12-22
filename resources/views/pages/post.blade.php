@@ -19,6 +19,25 @@
                     <a href="{{ route('posts.edit', $post->post_id) }}" class="edit">[edit]</a>
                 @endif
             <div>
+            @if (Auth::check() && !(Auth::id() === $post->user_id))
+                <div class="post-actions">
+                    <!-- Star Icon for Favorites -->
+                    <span 
+                        class="favorite-icon @if ($post->fans()->where('user_id', Auth::id())->exists()) filled @endif" 
+                        data-id="{{ $post->post_id }}" 
+                        title="Add to Favorites">
+                        ★
+                    </span>
+                    
+                    <!-- Report Icon for Bad Content -->
+                    <span 
+                        class="report-icon" 
+                        data-id="{{ $post->post_id }}" 
+                        title="Report Post">
+                        <a href="{{ route('posts.report', $post->post_id) }}">🛈</a>
+                    </span>
+                </div>
+            @endif
             <p class="post-time">{{ \Carbon\Carbon::parse($post->created_at)->format('h:i A | F d') }}</p>
         </header>
 
@@ -32,20 +51,22 @@
             <div class="stats">
                 <div class="votes">
                     <span 
+                    title="Like Post"
                     class="vote-icon @if ($post->votes()->where('user_id', Auth::id())->where('is_like', true)->exists()) filled @endif" 
                     data-id="{{ $post->post_id }}"
                     data-is-like="1">🡅</span>
-                    <span>{{ $post->votes()->where('is_like', true)->count() }}</span>
+                    <span title="Number of Likes">{{ $post->votes()->where('is_like', true)->count() }}</span>
                 </div>
                 <div class="votes">
                     <span 
+                    title="Dislike Post"
                     class="vote-icon @if ($post->votes()->where('user_id', Auth::id())->where('is_like', false)->exists()) filled @endif"
                     data-id="{{ $post->post_id }}"
                     data-is-like="0">🡇</span>
-                    <span>{{ $post->votes()->where('is_like', false)->count() }}</span>
+                    <span title="Number of Dislikes">{{ $post->votes()->where('is_like', false)->count() }}</span>
                 </div>
                 <div class="comments">
-                    <span class="vote-icon">&#128172;</span> <span>{{$post->comments()->count()}}</span>
+                    <span title="Comments" class="vote-icon">&#128172;</span> <span title="Number of Comments">{{$post->comments()->count()}}</span>
                 </div>
             </div>
         </footer>
@@ -64,7 +85,7 @@
                             @if (Auth::check() && Auth::id() === $comment->user_id)
                                 <a href="{{ route('comments.edit', $comment->comment_id) }}" class="edit">[edit]</a>
                             @endif
-                        <div>
+                        </div>
                         <span class="comment-time">{{ \Carbon\Carbon::parse($comment->created_at)->format('h:i A | F d') }}</span>
                     </header>
 
@@ -73,22 +94,35 @@
 
                     <!-- Comment Footer with Stats -->
                     <footer class="comment-footer">
+                        @if (Auth::check() && !(Auth::id() === $comment->user_id))
+                            <div class="comment-actions">                                
+                                <!-- Report Icon for Bad Content -->
+                                <span 
+                                    class="report-icon" 
+                                    data-id="{{ $comment->comment_id }}" 
+                                    title="Report Comment">
+                                    <a href="{{ route('comments.report', $comment->comment_id) }}">🛈</a>
+                                </span>
+                            </div>
+                        @endif
                         <div class="votes">
                             <span 
+                            title="Like Comment"
                             class="vote-icon @if ($comment->votes()->where('user_id', Auth::id())->where('is_like', true)->exists()) filled @endif"
                             data-id="{{ $comment->comment_id }}"
                             data-is-like="1">🡅</span>
-                            <span>{{ $comment->votes()->where('is_like', true)->count() }}</span>
+                            <span title="Number of Likes">{{ $comment->votes()->where('is_like', true)->count() }}</span>
                         </div>
                         <div class="votes">
                             <span 
+                            title="Dislike Comment"
                             class="vote-icon @if ($comment->votes()->where('user_id', Auth::id())->where('is_like', false)->exists()) filled @endif"
                             data-id="{{ $comment->comment_id }}"
                             data-is-like="0">🡇</span>
-                            <span>{{ $comment->votes()->where('is_like', false)->count() }}</span>
+                            <span title="Number of Dislikes">{{ $comment->votes()->where('is_like', false)->count() }}</span>
                         </div>
                         <div class="comments">
-                            <span class="vote-icon">&#128172;</span> <span>{{$comment->replies()->count()}}</span>
+                            <span title="Replies" class="vote-icon">&#128172;</span> <span title="Number of Replies">{{$comment->replies()->count()}}</span>
                         </div>
                     </footer>
                 </div>

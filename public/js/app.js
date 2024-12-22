@@ -22,7 +22,17 @@ function addEventListeners() {
     let cardCreator = document.querySelector('article.card form.new_card');
     if (cardCreator != null)
       cardCreator.addEventListener('submit', sendCreateCardRequest);
-  }
+    
+    let voteIcons = document.querySelectorAll('#post .post-footer .votes .vote-icon');
+    [].forEach.call(voteIcons, function(icon) {
+        icon.addEventListener('click', sendVoteRequest);
+    });
+
+    let commentVoteIcons = document.querySelectorAll('.comment-footer .votes .vote-icon');
+    [].forEach.call(commentVoteIcons, function(icon) {
+        icon.addEventListener('click', sendCommentVoteRequest);
+    });
+}
   
   function encodeForAjax(data) {
     if (data == null) return null;
@@ -40,6 +50,106 @@ function addEventListeners() {
     request.addEventListener('load', handler);
     request.send(encodeForAjax(data));
   }
+
+/* %%%%%%%%%%%%%%%%%%%%%% VOTE IN POST REQUEST %%%%%%%%%%%%%%%%%%%%%% */
+function sendVoteRequest(event) {
+  event.preventDefault();
+
+  let voteIcon = event.target;
+  let postId = voteIcon.getAttribute('data-id');
+  let isLike = voteIcon.getAttribute('data-is-like');
+
+  sendAjaxRequest('POST', `/api/posts/${postId}/vote`, { is_like: isLike }, handleVoteResponse);
+}
+
+function handleVoteResponse() {
+  if (this.status === 201 || this.status === 200) {
+    // Parse the JSON response
+    let response = JSON.parse(this.responseText);
+
+    // Ensure the response contains the required data
+    if (response.post_id) {
+      // Select the vote containers for the specific post
+      let voteContainers = document.querySelectorAll(`#post .post-footer .votes .vote-icon[data-id="${response.post_id}"]`);
+      // Update vote counts and filled status for each vote icon
+      voteContainers.forEach((voteIcon) => {
+        let isLike = voteIcon.getAttribute('data-is-like') === "1"; // Check if it's the upvote or downvote icon
+        let correspondingCountSpan = voteIcon.nextElementSibling; // The <span> next to the icon with the count
+        if (correspondingCountSpan && response.vote_count) {
+          // Update the vote count
+          correspondingCountSpan.textContent = isLike ? response.vote_count.up : response.vote_count.down;
+        }
+
+        // Handle filled class
+        if (this.status === 201) { // New vote
+          if (response.is_like == isLike) {
+            voteIcon.classList.add('filled');
+          }
+        } else if (this.status === 200) { // Update vote
+          if (response.is_like == isLike) {
+            voteIcon.classList.add('filled');
+          } else if (response.is_like == !isLike) {
+            voteIcon.classList.remove('filled');
+          } else {
+            voteIcon.classList.remove('filled');
+          }
+        }
+      });
+    }
+  } else {
+    console.error('Error voting:', this.status, this.responseText.error);
+  }
+}
+
+/* %%%%%%%%%%%%%%%%%%%%%% VOTE IN COMMENT REQUEST %%%%%%%%%%%%%%%%%%%%%% */
+function sendCommentVoteRequest(event) {
+  event.preventDefault();
+
+  let voteIcon = event.target;
+  let commentId = voteIcon.getAttribute('data-id');
+  let isLike = voteIcon.getAttribute('data-is-like');
+
+  sendAjaxRequest('POST', `/api/comments/${commentId}/vote`, { is_like: isLike }, handleCommentVoteResponse);
+}
+
+function handleCommentVoteResponse() {
+  if (this.status === 201 || this.status === 200) {
+    // Parse the JSON response
+    let response = JSON.parse(this.responseText);
+
+    // Ensure the response contains the required data
+    if (response.comment_id) {
+      // Select the vote containers for the specific comment
+      let voteContainers = document.querySelectorAll(`.comment-footer .votes .vote-icon[data-id="${response.comment_id}"]`);
+      // Update vote counts and filled status for each vote icon
+      voteContainers.forEach((voteIcon) => {
+        let isLike = voteIcon.getAttribute('data-is-like') === "1"; // Check if it's the upvote or downvote icon
+        let correspondingCountSpan = voteIcon.nextElementSibling; // The <span> next to the icon with the count
+        if (correspondingCountSpan && response.vote_count) {
+          // Update the vote count
+          correspondingCountSpan.textContent = isLike ? response.vote_count.up : response.vote_count.down;
+        }
+
+        // Handle filled class
+        if (this.status === 201) { // New vote
+          if (response.is_like == isLike) {
+            voteIcon.classList.add('filled');
+          }
+        } else if (this.status === 200) { // Update vote
+          if (response.is_like == isLike) {
+            voteIcon.classList.add('filled');
+          } else if (response.is_like == !isLike) {
+            voteIcon.classList.remove('filled');
+          } else {
+            voteIcon.classList.remove('filled');
+          }
+        }
+      });
+    }
+  } else {
+    console.error('Error voting:', this.status, this.responseText.error);
+  }
+}
   
   function sendItemUpdateRequest() {
     let item = this.closest('li.item');

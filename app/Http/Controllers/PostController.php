@@ -369,17 +369,26 @@ class PostController extends Controller
             ]);
             
             // Set vote details.
-            $vote->is_like = $request->input('is_like');
+            $vote->is_like = $isLike;
             $vote->user_id = Auth::user()->id;
             $vote->post_id = $post->post_id;
 
             // Save the vote and return it as JSON.
             $vote->save();
-            return redirect('posts/'.$post->post_id);
+            $like_count = $post->votes()->where('is_like', true)->count();
+            $dislike_count = $post->votes()->where('is_like', false)->count();
+            return response()->json([
+                'post_id' => $vote->post_id,
+                'is_like' => $isLike,
+                'vote_count' => [
+                    'up' => $like_count,
+                    'down' => $dislike_count
+                ]
+            ], 201);
         } else if($existingVote->is_like !== $isLike) {
             return $this->editVote($request, $post_id);
         } else if($existingVote->is_like === $isLike) {
-            return $this->removeVote($request, $post_id);
+            return $this->removeVote($post_id);
         } else {
             return response()->json([
                 'error' => 'Request is invalid or malformed.'
@@ -401,6 +410,7 @@ class PostController extends Controller
             return redirect('/logout');
         }
 
+        $isLike = $request->input('is_like') === '1' ? true : false;
         $post = Post::findOrFail($post_id);
 
         
@@ -420,17 +430,26 @@ class PostController extends Controller
 
         $this->authorize('editVote', [$post, $vote]);
 
-        $vote->is_like = $request->input('is_like');
+        $vote->is_like = $isLike;
 
         // Save the vote and redirect
         $vote->save();
-        return redirect('posts/'.$post->post_id);
+        $like_count = $post->votes()->where('is_like', true)->count();
+        $dislike_count = $post->votes()->where('is_like', false)->count();
+        return response()->json([
+            'post_id' => $vote->post_id,
+            'is_like' => $isLike,
+            'vote_count' => [
+                'up' => $like_count,
+                'down' => $dislike_count
+            ]
+        ], 200);
     }
 
     /**
      * Remove the specific resource.
      */
-    public function removeVote(Request $request, int $post_id)
+    public function removeVote(int $post_id)
     {
         if (!Auth::check()) {
             // Not logged in, redirect to login.
@@ -453,11 +472,19 @@ class PostController extends Controller
 
             // Delete the vote and return it as JSON.
             $vote->delete();
-            return redirect('posts/'.$post->post_id);
+            $like_count = $post->votes()->where('is_like', true)->count();
+            $dislike_count = $post->votes()->where('is_like', false)->count();
+            return response()->json([
+                'post_id' => $post_id,
+                'vote_count' => [
+                    'up' => $like_count,
+                    'down' => $dislike_count
+                ]
+            ], 200);
         }
         
         return response()->json([
-            'message' => 'Vote not found.',
+            'error' => 'Vote not found.',
             'post_id' => $post_id,
             'user_id' => Auth::user()->id,
         ], 404);

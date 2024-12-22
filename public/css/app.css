@@ -480,71 +480,147 @@ input[type=password]:focus {
   color: black;
 }
 
+
+/*------------------------ {POST PAGE} ------------------------*/
 #post {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  padding: 0 20px; /* Horizontal padding */
-  height: 100%;
+  display: grid;
+  padding: 1em;
+  margin: 1em;
+}
+#post h2 {
+  text-transform: uppercase;
+  padding-top: 1em;
+  color: #005237;
 }
 
-.post-main {
-  display: flex;
-  width: 100%;
-  margin: 30px 30px;
-  flex-wrap: wrap;
-  height: 100%;
-}
-
-.post-left {
-  flex: 2;
-  max-width: 60%;
-  padding: 0 20px;
-  color: #000000;
-}
-
-.post-right {
-  flex: 1;
-  max-width: 40%;
-  min-height: 100%;
-  background-color: #f9f9f9;
-  padding: 0px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.post-header {
+#post header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
 }
 
-.post-header h2 {
+#post header div {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  align-items: center;
+}
+#post header .post-time {
+  flex: 2;
+  text-align: end;
+}
+
+#post header h2 {
   font-weight: bold;
   text-transform: uppercase;
   color: #588368;
 }
 
-.post-header .edit {
-  font-size: 14px;
-  color: #007bff;
-  text-decoration: none;
-}
-
-.post-header .edit:hover {
+#post header .edit:hover {
   text-decoration: underline;
 }
 
-.post-time {
+#post .post-time {
   font-size: 14px;
-  color: #588368;
+  margin:0;
 }
 
-.post-footer {
+#post footer {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-top: 20px;
+  padding: 0px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+#post footer .author {
+  margin: 0;
+  flex: 1;
+}
+
+#post footer .stats {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+#post footer .votes,
+#post footer .comments {
+  display: flex;
+  flex-direction: row;
+  align-items:center;
+  gap: 0px;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+#post footer .vote-icon {
+  color:#c5c5c5;
+}
+
+#post footer .vote-icon {
+  font-size: 30px;
+}
+#post footer .vote-icon:hover {
+  color: #435c4f;
+  cursor: pointer;
+  
+}
+#post footer .vote-icon.filled {
+  color: #435c4f;
+}
+
+#post .comment-section {
+  margin-top: 50px;
+}
+#post .comment-section h3 {
+  padding-top: 1em;
+  border-bottom: 3px solid #d2e2d8;
+  text-transform: uppercase;
+}
+
+#post .comment {
+  border: 1px solid #588368;
+  padding: 5px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+#post .comment header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 0px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+#post .comment header div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+#post .comment header .comment-time {
+  flex: 2;
+  text-align: end;
+}
+#post .comment-time {
+  font-size: 14px;
+  margin:0;
+}
+#post .comment-section .comment footer {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  gap: 40px;
 }
 
 .author {
@@ -636,40 +712,6 @@ input[type=password]:focus {
   .post-left {
       max-width: 100%;
   }
-}
-
-.comment {
-  border: 1px solid #588368;
-  border-radius: 5px;
-  padding: 5px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-}
-
-.edit-link {
-  font-size: 14px;
-  color: #007bff;
-  text-decoration: none;
-  margin-left: 10px;
-}
-
-.edit-link:hover {
-  text-decoration: underline;
-}
-
-.comment-footer {
-  display: flex;
-  justify-content: flex-end; 
-  align-items: center;
-}
-
-.comment-stats {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.commentvotes {
-  margin-left: 10px;
 }
 
 .vote-btn {

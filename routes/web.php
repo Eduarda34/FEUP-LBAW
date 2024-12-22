@@ -61,7 +61,7 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/users/{id}/edit', 'showProfileEditorForm');
     Route::get('/users/{id}/followers', 'showFollowers');
     Route::get('/users/{id}/following', 'showFollowing');
-    Route::get('/users/{id}/report', 'showReportForm');
+    Route::get('/users/{id}/report', [PostController::class, 'showReportForm']);
     // API
     Route::post('/api/users/categories/{category_id}', 'followCategory');
     Route::delete('/api/users/categories/{category_id}', 'unfollowCategory');

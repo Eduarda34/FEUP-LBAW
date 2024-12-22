@@ -12,6 +12,7 @@ use App\Models\SystemManager;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -477,5 +478,21 @@ class UserController extends Controller
 
         // Redirect to the notifications page.
         return response()->back()->with('success', 'Notifications deleted successfully.')->setStatusCode(204);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate(['password' => 'required',]);
+
+        if (!Hash::check($request->password, $user->password)) {
+            return redirect()->back()->withErrors(['password' => 'Password is incorrect.']);
+        }
+
+        $user->delete();
+
+        Auth::logout();
+        return redirect('/')->with('success', 'Your account has been deleted successfully.');
     }
 }

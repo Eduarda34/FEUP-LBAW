@@ -74,6 +74,7 @@ Route::controller(UserController::class)->group(function () {
     Route::delete('api/users/notifications/{notification_id}', 'deleteNotification');
     Route::put('api/users/notifications', 'viewAllNotifications');
     Route::delete('api/users/notifications', 'deleteAllNotifications');
+    Route::delete('/account/delete', [UserController::class, 'deleteAccount'])->middleware('auth');
 });
 
 // Posts

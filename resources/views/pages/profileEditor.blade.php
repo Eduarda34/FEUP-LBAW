@@ -55,7 +55,26 @@
             <!-- Submit Button -->
             <div>
                 <button type="submit">Save Changes</button>
-            </div>
+            </div>          
+        </form>
+
+        <!-- Delete Account Button -->
+        <form action="/account/delete" method="POST" class="delete-account-form">
+            @csrf
+            @method('DELETE')
+
+            <button type="delete-account-button">Delete Account</button>
+
+            <label for="password">Confirm your password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            @if ($errors->has('password'))
+                <div class="alert">{{ $errors->first('password') }}</div>
+            @endif
+
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
         </form>
 
         @if(session('success'))

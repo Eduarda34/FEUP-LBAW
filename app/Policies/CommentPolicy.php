@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Comment;
 use App\Models\User;
+use App\Models\CommentVote;
 use Illuminate\Auth\Access\Response;
 
 class CommentPolicy

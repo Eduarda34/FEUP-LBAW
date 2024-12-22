@@ -201,24 +201,50 @@ class CommentController extends Controller
 
         $comment = Comment::findOrFail($comment_id);
 
-        // Create a blank new vote.
-        $vote = new CommentVote();
-
-        // Check if the current user is authorized to vote in this comment.
-        $this->authorize('vote', $comment);
-
-        $request->validate([
-            'is_like' => 'required|boolean',
-        ]);
+        $existingVote = CommentVote::where('user_id', Auth::id())
+                                ->where('comment_id', $comment->comment_id)
+                                ->first();
         
-        // Set vote details.
-        $vote->is_like = $request->input('is_like');
-        $vote->user_id = Auth::user()->id;
-        $vote->comment_id = $comment->comment_id;
+        $isLike = $request->input('is_like') === '1' ? true : false;
 
-        // Save the vote and return it as JSON.
-        $vote->save();
-        return response()->json($vote);
+        if(!$existingVote) {
+            // Create a blank new vote.
+            $vote = new CommentVote();
+
+            // Check if the current user is authorized to vote in this comment.
+            $this->authorize('vote', $comment);
+
+            $request->validate([
+                'is_like' => 'required|boolean',
+            ]);
+            
+            // Set vote details.
+            $vote->is_like = $isLike;
+            $vote->user_id = Auth::user()->id;
+            $vote->comment_id = $comment->comment_id;
+
+            // Save the vote and return it as JSON.
+            $vote->save();
+            $like_count = $comment->votes()->where('is_like', true)->count();
+            $dislike_count = $comment->votes()->where('is_like', false)->count();
+            return response()->json([
+                'comment_id' => $vote->comment_id,
+                'is_like' => $isLike,
+                'vote_count' => [
+                    'up' => $like_count,
+                    'down' => $dislike_count
+                ]
+            ], 201);
+        } else if($existingVote->is_like !== $isLike) {
+            return $this->editVote($request, $comment_id);
+        } else if($existingVote->is_like === $isLike) {
+            return $this->removeVote($comment_id);
+        } else {
+            return response()->json([
+                'error' => 'Request is invalid or malformed.'
+            ], 400);
+        }
+        
     }
 
     /**
@@ -234,36 +260,48 @@ class CommentController extends Controller
             // User blocked, redirect to logout.
             return redirect('/logout');
         }
-
+        $isLike = $request->input('is_like') === '1' ? true : false;
         $comment = Comment::findOrFail($comment_id);
 
         
         $request->validate([
             'is_like' => 'required|boolean',
         ]);
-        
-        $vote = CommentVote::firstOrCreate(
-            [
-                'user_id' => Auth::user()->id,
-                'comment_id' => $comment_id
-            ],
-            [
-                'is_like' => $request->input('is_like')
-            ]
-            );
             
+        $vote = CommentVote::where('user_id', Auth::user()->id)
+                    ->where('comment_id', $comment_id)
+                    ->first();
+
+        if (!$vote) {
+            $vote = new CommentVote();
+            $vote->user_id = Auth::user()->id;
+            $vote->comment_id = $comment_id;
+        }
+
         // Check if the current user is authorized to edit this vote.
-        $this->authorize('editVote', $comment, $vote);
+        $this->authorize('editVote', [$comment, $vote]);
+
+        $vote->is_like = $isLike;
 
         // Save the vote and return it as JSON.
         $vote->save();
-        return response()->json($vote);
+
+        $like_count = $comment->votes()->where('is_like', true)->count();
+        $dislike_count = $comment->votes()->where('is_like', false)->count();
+        return response()->json([
+            'comment_id' => $vote->comment_id,
+            'is_like' => $isLike,
+            'vote_count' => [
+                'up' => $like_count,
+                'down' => $dislike_count
+            ]
+        ], 200);
     }
 
     /**
      * Remove the specific resource.
      */
-    public function removeVote(Request $request, int $comment_id)
+    public function removeVote(int $comment_id)
     {
         if (!Auth::check()) {
             // Not logged in, redirect to login.
@@ -281,12 +319,20 @@ class CommentController extends Controller
                         ->first();
 
         if($vote) {
-            // Check if the current user is authorized to vote in this comment.
-            $this->authorize('removeVote', $comment, $vote);
+            // Check if the current user is authorized to remove a vote in this comment.
+            $this->authorize('removeVote', [$comment, $vote]);
 
             // Delete the vote and return it as JSON.
             $vote->delete();
-            return response()->json($vote);
+            $like_count = $comment->votes()->where('is_like', true)->count();
+            $dislike_count = $comment->votes()->where('is_like', false)->count();
+            return response()->json([
+                'comment_id' => $comment_id,
+                'vote_count' => [
+                    'up' => $like_count,
+                    'down' => $dislike_count
+                ]
+            ], 200);
         }
         
         return response()->json([

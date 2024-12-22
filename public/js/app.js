@@ -179,17 +179,44 @@ function addEventListeners() {
   
   addEventListeners();
 
-  document.getElementById('profile_picture').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+  document.addEventListener('DOMContentLoaded', function () {
+    const imageInput = document.getElementById('profile_picture');
+    const previewImage = document.querySelector('.profile-pic');
 
-    reader.onload = function(e) {
-        const previewImage = document.querySelector('.profile-pic');
-        previewImage.src = e.target.result;
-    };
+    if (imageInput) {
+      imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
 
-    if (file) {
-        reader.readAsDataURL(file);
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+      });
     }
-});
-  
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const imageInput = document.getElementById('news-image');
+    const previewImage = document.getElementById('preview-image');
+    
+    if (imageInput) {
+      imageInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
+    

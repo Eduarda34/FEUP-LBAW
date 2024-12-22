@@ -51,9 +51,6 @@ class PostController extends Controller
             $feedType = $request->query('feed', 'recent');
         }
 
-        // Authorize viewing posts.
-        $this->authorize('list', Post::class);
-
         // Fetch posts based on the feed type.
         switch ($feedType) {
             case 'popular':
@@ -71,10 +68,13 @@ class PostController extends Controller
                 break;
         }
 
+        $categories = Category::all();
+
         // Render the posts view.
         return view('pages.posts', [
             'posts' => $posts,
             'feedType' => $feedType,
+            'categories' => $categories,
         ]);
     }
 
@@ -92,18 +92,18 @@ class PostController extends Controller
 
         // Get category
         $category = Category::findOrFail($category_id);
+
+        $categories = Category::all();
         
         // Get all posts from the category.
         $posts = $category->posts()->orderBy('post_id', 'desc')->get();
 
-        // Check if the current user can list the posts.
-        $this->authorize('listByCategory', Post::class);
-
-        // The current user is authorized to list posts.
-
         // Use the pages.posts template to display all posts.
         return view('pages.posts', [
-            'posts' => $posts
+            'posts' => $posts,
+            'feedType' => 'category',
+            'category' => $category,
+            'categories' => $categories,
         ]);
     }
 
@@ -129,6 +129,14 @@ class PostController extends Controller
         return view('pages.postCreator', compact('categories'));
     }
 
+    /**
+     * Extract the first sentence from a given text.
+     */
+    private function extractFirstSentence(string $text): string
+    {
+        $sentences = preg_split('/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|!)\s/', $text, 2);
+        return $sentences[0] ?? $text;
+    }
 
     /**
      * Create a new resource.
@@ -152,22 +160,32 @@ class PostController extends Controller
 
         $request->validate([
             'title' => 'required|unique:posts|max:255',
-            'body' => 'required',
+            'synopsis' => 'nullable|string|max:300',
+            'body' => 'required|string|max:10000',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,category_id'
+            'categories.*' => 'exists:categories,category_id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
         
         // Set post details.
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->user_id = Auth::user()->id;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('post', 'public'); // Store in the "storage/app/public/post" directory
+            $post->image = $path;
+        }
 
-        // Save the post and return it as JSON.
+        // Use the provided synopsis or the first sentence of the body.
+        $post->synopsis = $request->input('synopsis') ?? $this->extractFirstSentence($request->input('body'));
+
+        // Save the post and redirect.
         $post->timestamps = false; // Disable timestamps temporarily
         $post->save();
         $post->timestamps = true;
         $post->categories()->attach($request->input('categories'));
-        return redirect('posts/'.$post->post_id);
+        return redirect('posts/'.$post->post_id)->with('success', 'Redirect after creating new post.')->setStatusCode(302);
     }
 
     /**
@@ -184,9 +202,6 @@ class PostController extends Controller
 
         // Get the post.
         $post = Post::findOrFail($post_id);
-
-        // Check if the current user can see (show) the post.
-        $this->authorize('show', $post);  
 
         // Use the pages.post template to display the post.
         return view('pages.post', [
@@ -223,7 +238,8 @@ class PostController extends Controller
             'old' => [
                 'title' => $post->title,
                 'body' => $post->body,
-                'categories' => $post->categories
+                'categories' => $post->categories,
+                'image' => $post->image
             ] 
         ]);
     }
@@ -248,18 +264,27 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         $request->validate([
-            'title' => 'required|string|max:50',
+            'title' => 'required|string|max:255',
+            'synopsis' => 'nullable|string|max:300',
             'body' => 'required|string|max:10000',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,category_id'
+            'categories.*' => 'exists:categories,category_id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('post', 'public'); // Store in the "storage/app/public/post" directory
+            $post->image = $path;
+        }
+        // Use the provided synopsis or the first sentence of the body.
+        $post->synopsis = $request->input('synopsis') ?? $this->extractFirstSentence($request->input('body'));
 
         $post->save();
         $post->categories()->sync($request->input('categories'));
-        return redirect('posts/'.$post->post_id);
+        return redirect('posts/'.$post->post_id)->with('success', 'Post updated successfully!')->setStatusCode(200);
     }
 
     /**
@@ -524,6 +549,26 @@ class PostController extends Controller
         Auth::user()->favorites()->detach($post_id);
 
         return response()->json(['message' => 'Post removed from favorites successfully.']);
+    }
+    
+    /**
+     * Show the form for reporting the specified post.
+     */
+    public function showReportForm(int $post_id)
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get the post.
+        $post = Post::findOrFail($post_id);
+
+        return view('pages.reportCreator', [ 'post' => $post ]);
     }
 
     /**

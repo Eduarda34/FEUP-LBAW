@@ -54,7 +54,7 @@ Route::controller(StaticPageController::class)->group(function () {
 
 // Users
 Route::controller(UserController::class)->group(function () {
-    Route::get('/users', 'list');
+    Route::get('/users', 'list')->name('users.list');
     Route::get('/users/categories', 'listCategories');
     Route::get('/users/notifications', 'showNotifications');
     Route::get('/users/{id}', 'show')->name('user.profile');
@@ -84,6 +84,7 @@ Route::controller(PostController::class)->group(function () {
     Route::get('/posts/category/{category_id}', 'listByCategory')->name('posts.category');
     Route::get('/posts/{post_id}', 'show')->name('posts.show');
     Route::get('/posts/{post_id}/edit', 'showPostEditorForm')->name('posts.edit');
+    Route::get('/posts/{post_id}/report', 'showReportForm');
     // API
     Route::post('/api/posts', [PostController::class, 'create'])->name('posts.store');
     Route::put('/api/posts/{post_id}', 'update')->name('posts.update');
@@ -93,6 +94,7 @@ Route::controller(PostController::class)->group(function () {
     Route::delete('/api/posts/{post_id}/vote', 'removeVote')->name('posts.vote.remove');
     Route::post('/api/posts/{post_id}/favorites', 'addToFavorites')->name('posts.favorites.add');
     Route::delete('/api/posts/{post_id}/favorites', 'removeFromFavorites')->name('posts.favorites.remove');
+    Route::post('api/posts/{post_id}/report', 'report');
     // System Manager
     Route::delete('/sys/posts/{post_id}', 'forceDelete');
 });
@@ -101,6 +103,7 @@ Route::controller(PostController::class)->group(function () {
 Route::controller(CommentController::class)->group(function () {
     Route::get('/posts/{post_id}/comments', 'list')->name('comments.list');
     Route::get('/comments/{comment_id}/edit', 'showCommentEditorForm')->name('comments.edit');
+    Route::get('/comments/{comment_id}/report', 'showReportForm');
     // API
     Route::post('/api/posts/{post_id}/comments', 'create')->name('comments.create');
     Route::put('/api/comments/{comment_id}', 'update')->name('comments.update');
@@ -109,6 +112,7 @@ Route::controller(CommentController::class)->group(function () {
     Route::post('/api/comments/{comment_id}/vote', 'vote')->name('comments.vote');
     Route::put('/api/comments/{comment_id}/vote', 'editVote')->name('comments.editVote');
     Route::delete('/api/comments/{comment_id}/vote', 'removeVote')->name('comments.removeVote');
+    Route::post('api/comments/{comment_id}/report', 'report');
 });
 
 //System Manager

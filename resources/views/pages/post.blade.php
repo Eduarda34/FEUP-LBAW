@@ -6,6 +6,11 @@
     <section id="post" class="post-details">
         <div class="post-main">
             <div class="post-left">
+                @if ($post->image)
+                    <div class="news-image-container">
+                        <img src="{{ asset('storage/' . $post->image) }}" alt="News Cover Image" class="news-image">
+                    </div>
+                @endif
                 <!-- Title, Edit Link and Date in the same line -->
                 <div class="post-header">
                     <h2>{{ strtoupper($post->title) }}</h2>

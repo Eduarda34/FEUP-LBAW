@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Report;
 use App\Models\UserReport;
+use App\Models\Notification;
+use App\Models\BlockedUser;
+use App\Models\SystemManager;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +43,34 @@ class UserController extends Controller
             'posts' => $posts, 
             'following' => $following, 
             'followers' => $followers
+        ]);
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function list(Request $request)
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+        
+        $users = User::whereNotIn('id', BlockedUser::query()->select('blocked_id'))
+            ->whereNotIn('id', SystemManager::query()->select('sm_id'))
+            ->orderBy('reputation', 'desc')
+            ->get();
+
+        $post_controller = new PostController();
+
+        // Render the users view.
+        return view('pages.users', [
+            'users' => $users,
+            'suggested_news' => $post_controller->getPopularPosts(),
         ]);
     }
 
@@ -243,6 +274,26 @@ class UserController extends Controller
     }
 
     /**
+     * Show the form for reporting the specified user.
+     */
+    public function showReportForm(int $id)
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get the user.
+        $user = User::findOrFail($id);
+
+        return view('pages.reportCreator', [ 'user' => $user ]);
+    }
+
+    /**
      * Report a specific user.
      */
     public function report(Request $request, int $id) 
@@ -281,7 +332,7 @@ class UserController extends Controller
         $userReport->reported_id = $reportedUser->id;
         $userReport->save();
 
-        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;
+        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);
     }
 
     /**
@@ -305,5 +356,126 @@ class UserController extends Controller
         return view('pages.notifications', [
             'notifications' => $notifications,
         ]);
+    }
+
+    /**
+     * Mark a specific notification as viewed/not viewed.
+     */
+    public function viewNotification(Request $request, int $notification_id)
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get the notification by ID
+        $notification = Notification::findOrFail($notification_id);
+
+        // Authorize the update action
+        $this->authorize('viewNotification', $notification);
+
+        // Validate the input
+        $request->validate([
+            'viewed' => 'required|boolean',
+        ]);
+
+        // Update the notification's information
+        $notification->viewed = $request->input('viewed');
+        $notification->save();
+
+        // Redirect to the notifications page
+        return redirect()->back()->with('success', 'Notification status updated successfully..')->setStatusCode(200);
+    }
+
+    /**
+     * Mark all user notifications as viewed/not viewed.
+     */
+    public function viewAllNotifications(Request $request)
+    {   
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get user notifications
+        $notifications = Auth::user()->notifications();
+
+        // Validate the input
+        $request->validate([
+            'viewed' => 'required|boolean',
+        ]);
+
+        // Update notifications' information
+        foreach ($notifications as $notification) {
+            // Authorize the update action
+            $this->authorize('viewNotification', $notification);
+
+            $notification->viewed = $request->input('viewed');
+            $notification->save();
+        }
+
+        // Redirect to the notifications page
+        return redirect()->back()->with('success', 'Notifications status updated successfully.')->setStatusCode(200);
+    }
+
+    /**
+     * Remove a specific notification.
+     */
+    public function deleteNotification(int $notification_id)
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get the notification by ID
+        $notification = Notification::findOrFail($notification_id);
+
+        // Check if the current user is authorized to delete this notification.
+        $this->authorize('deleteNotification', $notification);
+
+        // Delete the notification and redirect to the notifications page.
+        $notification->delete();
+        return response()->back()->with('success', 'Notification deleted successfully.')->setStatusCode(204);
+    }
+
+    /**
+     * Remove all user notifications.
+     */
+    public function deleteAllNotifications()
+    {
+        if (!Auth::check()) {
+            // Not logged in, redirect to login.
+            return redirect('/login');
+        }
+        if (Auth::user()->blocked) {
+            // User blocked, redirect to logout.
+            return redirect('/logout');
+        }
+
+        // Get user notifications
+        $notifications = Auth::user()->notifications();
+
+        foreach ($notifications as $notification) {
+            // Check if the current user is authorized to delete this notification.
+            $this->authorize('deleteNotification', $notification);
+
+            $notification->delete();
+        }
+
+        // Redirect to the notifications page.
+        return response()->back()->with('success', 'Notifications deleted successfully.')->setStatusCode(204);
     }
 }

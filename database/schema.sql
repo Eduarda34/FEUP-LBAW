@@ -117,6 +117,7 @@ CREATE TABLE posts (
     body TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP,
+    image VARCHAR(255),
     CONSTRAINT check_edition_date CHECK (updated_at IS NULL OR updated_at > created_at) -- BR12
 );
 

@@ -10,6 +10,28 @@
         @csrf
         @method('PUT')
 
+        <!-- News Cover Image Field -->
+        <div class="image-form">
+            <!-- Image Preview -->
+            <div class="mt-3">
+                <div class="news-image-container">
+                    <img id="preview-image" src="{{ asset('storage/' . $post->image) }}" alt="Preview" class="updated-image-preview">
+                </div>
+            </div>
+
+            <label for="image">News Cover Image:</label>
+            <input 
+                type="file" 
+                id="news-image" 
+                name="image" 
+                class="form-control"
+                accept="image/*"
+            >
+            @error('image')
+                <div class="error text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
         <!-- Title Field -->
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
@@ -28,6 +50,22 @@
             @enderror
         </div>
 
+        <!-- Synopsis Field -->
+        <div class="mb-3">
+            <label for="synopsis" class="form-label">Synopsis</label>
+            <textarea 
+                id="synopsis" 
+                name="synopsis" 
+                class="form-control" 
+                rows="5"  
+                maxlength="300" 
+                placeholder="Enter the synopsis of your post (optional)"
+            >{{ old('synopsis', $post->synopsis) }}</textarea>
+            @error('synopsis')
+                <div class="error text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
         <!-- Body Field -->
         <div class="mb-3">
             <label for="body" class="form-label">Body</label>
@@ -35,8 +73,9 @@
                 id="body" 
                 name="body" 
                 class="form-control" 
-                rows="5" 
+                rows="10" 
                 required 
+                maxlength="10000" 
                 placeholder="Enter the content of your post"
             >{{ old('body', $post->body) }}</textarea>
             @error('body')

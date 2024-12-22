@@ -55,10 +55,29 @@
 
             <!-- Search Bar Section -->
             <section id="search-bar">
-                <form action="{{ route('search.posts') }}" method="GET" >
-                    <input type="text" name="query" placeholder="Search posts..." required>
-                    <button type="submit">Search</button>
-                </form>
+                <div class="navigation-search">
+                    @if (isset($breadcrumbs))
+                        <div class="breadcrumb">
+                            @foreach ($breadcrumbs as $breadcrumb)
+                                @if ($breadcrumb['url'])
+                                    <span class="breadcrumb-item">
+                                        <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a>
+                                    </span>
+                                @else
+                                    <span class="breadcrumb-item active">{{ $breadcrumb['title'] }}</span>
+                                @endif
+                                @if (!$loop->last)
+                                    <span class="breadcrumb-separator">▶</span>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif    
+
+                    <form action="{{ route('search.posts') }}" method="GET" >
+                        <input type="text" name="query" placeholder="Search posts..." required>
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
             </section>
             <!-- Content Section -->
             <section id="content">

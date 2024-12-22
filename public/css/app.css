@@ -130,6 +130,45 @@ header .search-bar button {
   padding-top: 1em;
   font-size:xx-large;
 }
+/*------------------------ {BREADCRUMBS} -----------------------*/
+
+.navigation-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding-bottom: 1em;
+  margin-left: 1em;
+}
+
+.breadcrumb-item {
+  margin-right: 5px;
+}
+
+.breadcrumb-item a {
+  text-decoration: underline;
+  text-transform: none;
+  color: #064f36;
+  font-weight: bold;
+}
+
+.breadcrumb-item.active {
+  text-transform: none;
+  color: #064f36;
+  font-weight: bold;
+}
+
+.breadcrumb-separator {
+  margin-right: 5px;
+  color: #064f36;
+}
 
 /*------------------------ {POSTS LIST} ------------------------*/
 #posts {
@@ -662,6 +701,8 @@ input[type=password]:focus {
   color: #0b2e06;
 }
 
+/*------------------------ {SEARCH BAR} ------------------------*/
+
 #search-bar {
   background-color: #7c9987;
   border-radius: 15px;
@@ -682,7 +723,6 @@ input[type=password]:focus {
   color: #ffffff;
   border-radius: 20px;
   border: 2px solid #cccccc;
-  width: 40%;
   margin-right: 10px;
 }
 #search-bar button {
@@ -695,6 +735,8 @@ input[type=password]:focus {
 #search-bar button:hover {
   background-color: #009c51;
 }
+
+
 .create-post-btn {
   text-align: center;
   margin-top: 20px;

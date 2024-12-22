@@ -5,7 +5,9 @@
 @section('content')
 
 <h2>CONTACTS</h2>
-    <h3>We are the founders of NewsNet. Contact us here: </h3>
+    <section id="about_body">
+        <h3>We are the founders of NewsNet. Contact us here: </h3>
+    </section>
     <div id=contacts>
         <div class=contact-information>
             <h3>Alexandre Santos</h3>

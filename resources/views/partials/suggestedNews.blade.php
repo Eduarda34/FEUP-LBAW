@@ -3,7 +3,7 @@
     <div id="suggested-item">
         @if ($news->image)
             <div class="news-image-container">
-                <img src="{{ asset('storage/' . $news->image) }}" alt="News Cover Image" class="news-image">
+                <img src="{{ asset('storage/' . $news->image) }}" alt="News Cover Image" class="news-image-small">
             </div>
         @endif
         <div class="news-information">

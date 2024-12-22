@@ -84,7 +84,7 @@ Route::controller(PostController::class)->group(function () {
     Route::get('/posts/category/{category_id}', 'listByCategory')->name('posts.category');
     Route::get('/posts/{post_id}', 'show')->name('posts.show');
     Route::get('/posts/{post_id}/edit', 'showPostEditorForm')->name('posts.edit');
-    Route::get('/posts/{post_id}/report', 'showReportForm');
+    Route::get('/posts/{post_id}/report', 'showReportForm')->name('posts.report');
     // API
     Route::post('/api/posts', [PostController::class, 'create'])->name('posts.store');
     Route::put('/api/posts/{post_id}', 'update')->name('posts.update');
@@ -103,7 +103,7 @@ Route::controller(PostController::class)->group(function () {
 Route::controller(CommentController::class)->group(function () {
     Route::get('/posts/{post_id}/comments', 'list')->name('comments.list');
     Route::get('/comments/{comment_id}/edit', 'showCommentEditorForm')->name('comments.edit');
-    Route::get('/comments/{comment_id}/report', 'showReportForm');
+    Route::get('/comments/{comment_id}/report', 'showReportForm')->name('comments.report');
     // API
     Route::post('/api/posts/{post_id}/comments', 'create')->name('comments.create');
     Route::put('/api/comments/{comment_id}', 'update')->name('comments.update');

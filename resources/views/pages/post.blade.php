@@ -144,6 +144,23 @@
                         </div>
                     </footer>
 
+                    @if (Auth::check() && Auth::id() === $comment->user_id)
+                        <button class="delete-comment-btn">Delete</button>
+                        
+                        <div class="delete-comment-modal" style="display: none;">
+                            <h3 class="delete-comment-modal-title">Delete Comment</h3>
+                            <p class="delete-comment-modal-message">Are you sure you want to delete this comment? This action cannot be undone.</p>
+                            <div class="delete-comment-modal-actions">
+                                <button class="delete-comment-modal-cancel">Cancel</button>
+                                <button class="delete-comment-btn">Delete</button>
+                            </div>
+                        </div>
+
+                        <div class="delete-comment-error" style="display: none;">
+                            The comment cannot be deleted because it has associated votes or replies.
+                        </div>
+                    @endif
+
             @endforeach
         </section>
 

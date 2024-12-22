@@ -96,6 +96,7 @@ Route::controller(PostController::class)->group(function () {
     Route::post('/api/posts/{post_id}/favorites', 'addToFavorites')->name('posts.favorites.add');
     Route::delete('/api/posts/{post_id}/favorites', 'removeFromFavorites')->name('posts.favorites.remove');
     Route::post('api/posts/{post_id}/report', 'report');
+    Route::delete('/comments/{comment}', 'CommentController@delete')->name('comments.delete');
     // System Manager
     Route::delete('/sys/posts/{post_id}', 'forceDelete');
 });

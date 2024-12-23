@@ -47,6 +47,7 @@
                                 @if (Auth::user()->system_managers)
                                     <a href="/sys/reports">Reports</a>
                                 @endif
+                                <a href="{{ url('/posts/favorites') }}">Favorites</a>
                                 <a href="{{ url('/logout') }}">Logout</a>
                             </div>
                         </div>

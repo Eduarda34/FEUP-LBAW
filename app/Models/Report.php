@@ -43,4 +43,12 @@ class Report extends Model
     public function comment(): HasOne {
         return $this->hasOne(CommentReport::class, 'report_id');
     }
+
+    /**
+     * Define a relationship to the BlockedUser model.
+     */
+    public function blocked_user(): HasOne
+    {
+        return $this->hasOne(BlockedUser::class, 'report_id');
+    }
 }

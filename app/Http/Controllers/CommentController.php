@@ -431,15 +431,14 @@ class CommentController extends Controller
         $report = new Report();
         $report->reporter_id = Auth::id();
         $report->reason = $request->input('reason');
-        $report->comment = $reportedComment;
         $report->save();
 
-        // Add the report to the `post_report` table.
-        /* $postReport = new PostReport();
-        $postReport->report_id = $report->report_id;
-        $postReport->reported_id = $reportedComment->id;
-        $postReport->save(); */
+        // Add the report to the `comment_report` table.
+        $commentReport = new CommentReport();
+        $commentReport->report_id = $report->report_id;
+        $commentReport->comment_id = $reportedComment->comment_id;
+        $commentReport->save();
 
-        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;
+        return redirect('/posts/'.$reportedComment->post_id)->with('success', 'Report created successfully.')->setStatusCode(201);;
     }
 }

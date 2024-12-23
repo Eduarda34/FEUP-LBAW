@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\UserReport;
 use App\Models\PostReport;
 use App\Models\CommentReport;
+use App\Models\User;
 use App\Models\BlockedUser;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -77,7 +78,7 @@ class SystemManagerController extends Controller
         $user = User::findOrFail($id);
 
         // Check if the user is already blocked.
-        if ($user->blocked()) {
+        if ($user->blocked) {
             return redirect()->back()->withErrors(['error' => 'User is already blocked.']);
         }
 
@@ -86,10 +87,11 @@ class SystemManagerController extends Controller
         $blocked->blocked_id = $id;
         $blocked->reason = $request->input('reason');
         $blocked->report_id = $request->input('report_id');
+        $blocked->save();
 
-        return redirect()->back()
+        return redirect('/sys/reports')
                 ->with('success', 'User successfully blocked.')
-                ->setStatusCode(204);
+                ->setStatusCode(201);
     }
 
     /**
@@ -121,15 +123,15 @@ class SystemManagerController extends Controller
         // Unblock the user.
         $blockedUser->delete();
 
-        return redirect()->back()
+        return redirect('/sys/reports')
             ->with('success', 'User successfully unblocked.')
-            ->setStatusCode(204);
+            ->setStatusCode(200);
     }
 
     /**
      * Resolves a specific report.
      */
-    public function resolveReport($report_id)
+    public function resolveReport(int $report_id)
     {
         // Check if the user is logged in.
         if (!Auth::check()) {
@@ -159,7 +161,7 @@ class SystemManagerController extends Controller
 
         return redirect()->back()
             ->with('success', 'Report successfully resolved.')
-            ->setStatusCode(204);
+            ->setStatusCode(200);
     }
 
     /**

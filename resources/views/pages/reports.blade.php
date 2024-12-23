@@ -4,9 +4,8 @@
 
 @section('content')
 
-
-<section id="reports">
-    <section id="cards">
+<section id="content_body">
+    <section id="reports" class="left-panel">
     <h2>Reports to resolve</h2>
         @if($unresolvedReports->isEmpty())
             <p>No unresolved reports.</p>
@@ -22,7 +21,7 @@
         @endif
     </section>
 
-    <section id="categories">
+    <section id="blocked-users" class="right-panel">
         <h2>Blocked</h2>
         @if ($blocked)
         <ul class= "blocked">

@@ -349,18 +349,12 @@ article.post footer .vote-icon {
   margin-left: 1em;
 }
 
-#reports {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  margin-top: 2em;
-  margin-left: 3em;
-}
-
-#reports > #cards {
+/*------------------------ {REPORTS PAGE} ------------------------*/
+#content_body > #reports {
   margin-right: 3em;
 }
 
-#reports > #cards > .card {
+#content_body > #reports > .report {
   border: #005237;
   border-style: solid;
   border-radius: 5px;
@@ -368,8 +362,14 @@ article.post footer .vote-icon {
   margin: 5px;
 }
 
-.card .card {
-  padding: 5px;
+#content_body > #reports > .report .report-buttons{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report .report-buttons{
+  display: none;
 }
 
 #about_body > h3 {
@@ -470,6 +470,15 @@ article.post footer .vote-icon {
   margin-right: 20px;
   border-radius: 50%; 
   border: 4px solid #6A837B; 
+}
+
+#profile-container .blocked-report {
+  border: #005237;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 2px;
+  margin: 5px;
+  margin-top: 20px;
 }
 
 /*------------------------ {PROFILE EDITOR FORM} ------------------------*/
@@ -589,7 +598,6 @@ input[type=password]:focus {
 }
 #post h2 {
   text-transform: uppercase;
-  padding-top: 1em;
   color: #005237;
 }
 
@@ -599,7 +607,8 @@ input[type=password]:focus {
   align-items: center;
   padding: 0px;
   position: relative;
-  bottom: 0;
+  margin-top: 10px;
+  margin-bottom: 20px;
   width: 100%;
 }
 
@@ -938,7 +947,6 @@ input::placeholder, textarea::placeholder {
   border: 3px solid #6A837B;
   height: 400px;
   object-fit: cover;
-  object-position: bottom;
 }
 .news-image-small {
   width: 100%;

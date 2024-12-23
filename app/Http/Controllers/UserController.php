@@ -31,6 +31,10 @@ class UserController extends Controller
         // Get the user.
         $user = User::findOrFail($id);
 
+        if ($user->blocked && !Auth::user()->system_managers) {
+            return abort(403, 'User unavailable.');
+        }
+
         // Check if the current user can see (show) the user profile.
         $this->authorize('show', User::class);  
 
@@ -142,7 +146,7 @@ class UserController extends Controller
         $user->save();
 
         // Redirect to the user's profile
-        return redirect('users/' . $user->id)->with('success', 'Profile updated successfully!');
+        return redirect('/users/' . $user->id)->with('success', 'Profile updated successfully!');
     }
 
     /**
@@ -351,7 +355,7 @@ class UserController extends Controller
         $userReport->reported_id = $reportedUser->id;
         $userReport->save();
 
-        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);
+        return redirect('/users/'.$reportedUser->id)->with('success', 'Report created successfully.')->setStatusCode(201);
     }
 
     /**

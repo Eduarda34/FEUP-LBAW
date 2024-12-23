@@ -21,4 +21,12 @@ class BlockedUser extends Model
     public function user(): BelongsTo {
         return $this->belongsTo(User::class, 'blocked_id');
     }
+
+    /**
+     * Define a relationship to the Report model.
+     */
+    public function report(): BelongsTo
+    {
+        return $this->belongsTo(Report::class, 'report_id');
+    }
 }

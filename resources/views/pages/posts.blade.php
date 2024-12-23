@@ -15,6 +15,8 @@
                     <span id="follow-category-btn" class="btn" data-id="{{ $category->category_id }}">Follow</span>
                 @endif
             </div>
+        @elseif ($feedType == 'favorites') 
+            <h2>FAVORITE NEWS</h2>
         @else
             <h2>TRENDING NEWS</h2>
         @endif

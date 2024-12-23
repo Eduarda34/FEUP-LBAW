@@ -115,6 +115,8 @@ Route::controller(CommentController::class)->group(function () {
     Route::put('/api/comments/{comment_id}/vote', 'editVote')->name('comments.editVote');
     Route::delete('/api/comments/{comment_id}/vote', 'removeVote')->name('comments.removeVote');
     Route::post('api/comments/{comment_id}/report', 'report');
+    // System Manager
+    Route::delete('/sys/comments/{comment_id}', 'forceDelete')->name('sys.commentDelete');
 });
 
 //System Manager

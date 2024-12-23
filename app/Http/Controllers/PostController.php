@@ -517,12 +517,13 @@ class PostController extends Controller
         // Get all posts.
         $posts = Auth::user()->favorites()->get();
 
-        // The current user is authorized to list posts.
+        $categories = Category::all();
 
         // Use the pages.posts template to display all posts.
         return view('pages.posts', [
             'posts' => $posts,
-            'feedType' => 'favorites'
+            'feedType' => 'favorites',
+            'categories' => $categories
         ]);
     }
 
@@ -649,6 +650,6 @@ class PostController extends Controller
         $postReport->post_id = $reportedPost->post_id;
         $postReport->save();
 
-        return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;
+        return redirect('/posts/'.$reportedPost->post_id)->with('success', 'Report created successfully.')->setStatusCode(201);;
     }
 }

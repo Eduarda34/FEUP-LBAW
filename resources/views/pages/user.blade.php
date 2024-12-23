@@ -43,6 +43,11 @@
                 </div> 
             </div>
         </div>
+        @if ($user->blocked && Auth::user()->system_managers)
+            <div class="blocked-report">
+                @include('partials.report', ['report' => $user->blocked->report])
+            </div>
+        @endif
     </section>
     <section id="user-posts" class="right-panel">
         @include('partials.userPosts', ['posts' => $posts])

@@ -207,7 +207,7 @@ class PostController extends Controller
         }
 
         $suggestedNews = $this->getPopularPosts()->reject(function ($news) use ($post_id) {
-            return $news->id === $post_id;
+            return $news->post_id === $post_id;
         });
 
         // Use the pages.post template to display the post.

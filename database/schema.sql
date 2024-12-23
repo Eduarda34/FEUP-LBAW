@@ -52,8 +52,12 @@ DROP TRIGGER IF EXISTS trigger_reply_notification ON replies CASCADE;
 DROP FUNCTION IF EXISTS create_reply_notification CASCADE;
 DROP TRIGGER IF EXISTS trigger_post_notification ON posts CASCADE;
 DROP FUNCTION IF EXISTS create_post_notification CASCADE;
-DROP TRIGGER IF EXISTS update_reputation_post_vote ON post_votes CASCADE;
-DROP TRIGGER IF EXISTS update_reputation_comment_vote ON comment_votes CASCADE;
+DROP TRIGGER IF EXISTS update_reputation_post_vote_insert ON post_votes CASCADE;
+DROP TRIGGER IF EXISTS update_reputation_post_vote_update ON post_votes CASCADE;
+DROP TRIGGER IF EXISTS update_reputation_post_vote_delete ON post_votes CASCADE;
+DROP TRIGGER IF EXISTS update_reputation_comment_vote_insert ON comment_votes CASCADE;
+DROP TRIGGER IF EXISTS update_reputation_comment_vote_update ON comment_votes CASCADE;
+DROP TRIGGER IF EXISTS update_reputation_comment_vote_delete ON comment_votes CASCADE;
 DROP FUNCTION IF EXISTS update_user_reputation CASCADE;
 DROP TRIGGER IF EXISTS check_comment_date_trigger ON comments CASCADE;
 DROP FUNCTION IF EXISTS check_comment_date CASCADE;
@@ -76,6 +80,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    bio TEXT,
     password VARCHAR(255) NOT NULL,
     reputation INT DEFAULT 0,
     profile_picture VARCHAR(255),
@@ -490,41 +495,117 @@ CREATE FUNCTION update_user_reputation()
 RETURNS TRIGGER AS 
 $BODY$
     BEGIN
-        IF TG_TABLE_NAME = 'post_votes' THEN
-            IF NEW.is_like THEN
-                UPDATE users
-                SET reputation = reputation + 1
-                WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
-            ELSE
-                UPDATE users
-                SET reputation = reputation - 1
-                WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+        -- INSERT
+        IF TG_OP = 'INSERT' THEN
+            IF TG_TABLE_NAME = 'post_votes' THEN
+                IF NEW.is_like THEN
+                    UPDATE users
+                    SET reputation = reputation + 1
+                    WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                ELSE
+                    UPDATE users
+                    SET reputation = reputation - 1
+                    WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                END IF;
+            ELSIF TG_TABLE_NAME = 'comment_votes' THEN
+                IF NEW.is_like THEN
+                    UPDATE users
+                    SET reputation = reputation + 1
+                    WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                ELSE
+                    UPDATE users
+                    SET reputation = reputation - 1
+                    WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                END IF;
             END IF;
-        ELSIF TG_TABLE_NAME = 'comment_votes' THEN
-            IF NEW.is_like THEN
-                UPDATE users
-                SET reputation = reputation + 1
-                WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
-            ELSE
-                UPDATE users
-                SET reputation = reputation - 1
-                WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+
+        -- DELETE
+        ELSIF TG_OP = 'DELETE' THEN
+            IF TG_TABLE_NAME = 'post_votes' THEN
+                IF OLD.is_like THEN
+                    UPDATE users
+                    SET reputation = reputation - 1
+                    WHERE id = (SELECT user_id FROM posts WHERE post_id = OLD.post_id);
+                ELSE
+                    UPDATE users
+                    SET reputation = reputation + 1
+                    WHERE id = (SELECT user_id FROM posts WHERE post_id = OLD.post_id);
+                END IF;
+            ELSIF TG_TABLE_NAME = 'comment_votes' THEN
+                IF OLD.is_like THEN
+                    UPDATE users
+                    SET reputation = reputation - 1
+                    WHERE id = (SELECT user_id FROM comments WHERE comment_id = OLD.comment_id);
+                ELSE
+                    UPDATE users
+                    SET reputation = reputation + 1
+                    WHERE id = (SELECT user_id FROM comments WHERE comment_id = OLD.comment_id);
+                END IF;
+            END IF;
+
+        -- UPDATE
+        ELSIF TG_OP = 'UPDATE' THEN
+            IF TG_TABLE_NAME = 'post_votes' THEN
+                IF OLD.is_like <> NEW.is_like THEN
+                    IF NEW.is_like THEN
+                        UPDATE users
+                        SET reputation = reputation + 2
+                        WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                    ELSE
+                        UPDATE users
+                        SET reputation = reputation - 2
+                        WHERE id = (SELECT user_id FROM posts WHERE post_id = NEW.post_id);
+                    END IF;
+                END IF;
+            ELSIF TG_TABLE_NAME = 'comment_votes' THEN
+                IF OLD.is_like <> NEW.is_like THEN
+                    IF NEW.is_like THEN
+                        UPDATE users
+                        SET reputation = reputation + 2
+                        WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                    ELSE
+                        UPDATE users
+                        SET reputation = reputation - 2
+                        WHERE id = (SELECT user_id FROM comments WHERE comment_id = NEW.comment_id);
+                    END IF;
+                END IF;
             END IF;
         END IF;
+
         RETURN NEW;
     END;
 $BODY$ 
 LANGUAGE plpgsql;
 
--- Trigger for post votes
-CREATE TRIGGER update_reputation_post_vote
+-- Triggers for post votes
+CREATE TRIGGER update_reputation_post_vote_insert
 AFTER INSERT ON post_votes
 FOR EACH ROW
 EXECUTE PROCEDURE update_user_reputation();
 
--- Trigger for comment votes
-CREATE TRIGGER update_reputation_comment_vote
+CREATE TRIGGER update_reputation_post_vote_update
+AFTER UPDATE ON post_votes
+FOR EACH ROW
+EXECUTE PROCEDURE update_user_reputation();
+
+CREATE TRIGGER update_reputation_post_vote_delete
+BEFORE DELETE ON post_votes
+FOR EACH ROW
+EXECUTE PROCEDURE update_user_reputation();
+
+-- Triggers for comment votes
+CREATE TRIGGER update_reputation_comment_vote_insert
 AFTER INSERT ON comment_votes
+FOR EACH ROW
+EXECUTE PROCEDURE update_user_reputation();
+
+CREATE TRIGGER update_reputation_comment_vote_update
+AFTER UPDATE ON comment_votes
+FOR EACH ROW
+EXECUTE PROCEDURE update_user_reputation();
+
+CREATE TRIGGER update_reputation_comment_vote_delete
+BEFORE DELETE ON comment_votes
 FOR EACH ROW
 EXECUTE PROCEDURE update_user_reputation();
 
@@ -832,12 +913,12 @@ END TRANSACTION; */
 
 -- Populate
 
-INSERT INTO users (username, email, password, reputation, created_at) VALUES 
-    ('admin', 'admin@lbaw2484.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 0, NOW()),
-    ('johndoe', 'johndoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 10, NOW()),
-    ('janedoe', 'janedoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 20, NOW()),
-    ('alice', 'alice@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 5, NOW()),
-    ('Cristiano', 'cristiano_cr7_ronaldo@goat.pt', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', 0, NOW());
+INSERT INTO users (username, email, password, created_at) VALUES 
+    ('admin', 'admin@lbaw2484.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
+    ('johndoe', 'johndoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
+    ('janedoe', 'janedoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
+    ('alice', 'alice@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
+    ('Cristiano', 'cristiano_cr7_ronaldo@goat.pt', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW());
 
 INSERT INTO system_managers (sm_id) VALUES (1);
 

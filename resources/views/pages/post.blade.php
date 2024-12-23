@@ -6,11 +6,10 @@
 
 <section id="content_body">
     <section id="post" class="left-panel" data-id="{{ $post->post_id }}">
-        @if ($post->image)
-            <div class="news-image-container">
-                <img src="{{ asset('storage/' . $post->image) }}" alt="News Cover Image" class="news-image">
-            </div>
-        @endif
+        <div class="news-image-container">
+            <img src="{{ $post->getCoverImage() }}" alt="News Cover Image" class="news-image">
+        </div>
+        
         <!-- Title, Edit Link and Date in the same line -->
         <header class="post-header">
             <div>
@@ -38,7 +37,13 @@
                     </span>
                 </div>
             @endif
-            <p class="post-time">{{ \Carbon\Carbon::parse($post->created_at)->format('h:i A | F d') }}</p>
+            <p class="post-time">
+                @if ($post->updated_at)
+                    Edited at {{ \Carbon\Carbon::parse($post->updated_at)->format('h:i A | F d') }}
+                @else
+                    {{ \Carbon\Carbon::parse($post->created_at)->format('h:i A | F d') }}
+                @endif
+            </p>
         </header>
 
         <p class="post-content">{{ $post->body }}</p>

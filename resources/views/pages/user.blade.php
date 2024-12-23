@@ -3,27 +3,50 @@
 @section('title', $user->username . 'profile')
 
 @section('content')
-    <section id="profile-container">
-        <h2>{{ $user->username }}</h2>
 
+<section id="content_body">
+    <section id="profile-container" class="left-panel" data-id="{{ $user->id }}">
+        <header>
+            <div id="user-name">
+            <h2>{{ $user->username }}</h2>
+            @if (Auth::check() && Auth::id() === $user->id)
+                <a href="/users/{{ $user->id }}/edit" class="edit">[edit]</a>
+            </div>
+            @else
+            </div>
+                <div id="icons">
+                    @if ($user->followers()->where('follower_id', Auth::id())->exists())
+                        <span id="follow-btn" class="btn inverted" data-id="{{ $user->id }}">Unfollow</span>
+                    @else
+                        <span id="follow-btn" class="btn" data-id="{{ $user->id }}">Follow</span>
+                    @endif
+                    <span 
+                        class="report-icon" 
+                        data-id="{{ $user->id }}" 
+                        title="Report User">
+                        <a href="{{ route('users.report', $user->id) }}">🛈</a>
+                    </span>
+                </div>
+            @endif
+        </header>
         <div class="profile-info">
             <img src="{{ $user->getProfilePicture() }}" alt="Profile Picture" class="profile-pic">
 
-            <!--User information-->
-            @if (Auth::check() && Auth::id() === $user->id)
-                <p>{{ $user->username}} <a href="/users/{{ $user->id }}/edit">[edit]</a></p>
-            @endif
-            <p>Followers: {{ $user->followers }}</p>
-            <p>Following: {{ $user->following }}</p>
-            <p>Reputation: {{$user->reputation }}</p>
-
-            <h2>Who is Admin?</h2>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed volutpat purus. 
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                Nam feugiat, mauris sodales sagittis semper, eros velit aliquam lacus, non luctus ligula nisi in mi.
-            </p>
-            
+            <div id="user-details">
+                <!--User information-->
+                <p>Followers: {{ $user->followers()->count() }}</p>
+                <p>Following: {{ $user->following()->count() }}</p>
+                <p>Reputation: {{$user->reputation }}</p>
+                <div id="user-bio">
+                    <h3>Who is {{ $user->username }}?</h3>
+                    <p>{{ $user->bio }}</p>
+                </div> 
+            </div>
         </div>
     </section>
+    <section id="user-posts" class="right-panel">
+        @include('partials.userPosts', ['posts' => $posts])
+    </section>
+</section>
+
 @endsection

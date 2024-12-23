@@ -10,9 +10,9 @@
             <div id="category-title">
                 <h2>{{ $category->name }}</h2>
                 @if ($category->users()->where('user_id', Auth::id())->exists())
-                    <span id="follow-btn" class="btn inverted" data-id="{{ $category->category_id }}">Unfollow</span>
+                    <span id="follow-category-btn" class="btn inverted" data-id="{{ $category->category_id }}">Unfollow</span>
                 @else
-                    <span id="follow-btn" class="btn" data-id="{{ $category->category_id }}">Follow</span>
+                    <span id="follow-category-btn" class="btn" data-id="{{ $category->category_id }}">Follow</span>
                 @endif
             </div>
         @else

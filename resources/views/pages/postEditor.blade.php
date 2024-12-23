@@ -6,7 +6,7 @@
 <div class="container">
     <h1>Edit Post</h1>
 
-    <form action="{{ route('posts.update', $post->post_id) }}" method="POST">
+    <form action="{{ route('posts.update', $post->post_id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -15,7 +15,7 @@
             <!-- Image Preview -->
             <div class="mt-3">
                 <div class="news-image-container">
-                    <img id="preview-image" src="{{ asset('storage/' . $post->image) }}" alt="Preview" class="updated-image-preview">
+                    <img id="preview-image" src="{{ $post->getCoverImage() }}" alt="Preview" class="updated-image-preview">
                 </div>
             </div>
 

@@ -84,6 +84,14 @@ nav {
   transition: transform 0.2s ease;
 }
 
+.bell-icon {
+   filter: invert(15%) sepia(80%) saturate(108%) hue-rotate(127deg) brightness(40%) contrast(92%);
+}
+
+.bell-icon:hover {
+   filter: invert(15%) sepia(80%) saturate(108%) hue-rotate(80deg) brightness(70%) contrast(122%);
+}
+
 main > header a.button:hover {
     background: none;
     color: #4c8c4a;
@@ -172,13 +180,13 @@ header .search-bar button {
 
 /*------------------------ {FOOTER} ------------------------*/
 
-footer {
+main > footer {
   text-align: center;
   padding: 3px;
   color: #435c4f;
 }
 
-footer p {
+main > footer p {
   margin-bottom: 3px;
 }
 
@@ -186,11 +194,12 @@ footer p {
 
 #posts {
   display: grid;
+  padding-top: 1em;
 }
 #posts h2 {
   text-transform: uppercase;
   margin-left: 1em;
-  padding-top: 1em;
+  margin-bottom: 0;
   color: #005237;
 }
 #posts article.post {
@@ -262,6 +271,52 @@ article.post footer .vote-icon {
   text-align: center;
   padding: 10px;
   font-size: larger;
+}
+
+.btn {
+  background-color: #ffffff;
+  border: 5px solid #435c4f;
+  text-transform: uppercase;
+  color: #435c4f;
+  padding: 5px;
+  margin: 0;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  width: fit-content;
+  height: fit-content;
+}
+.btn:hover {
+  background-color: #435c4f;
+  border-color: #435c4f;
+  color: white;
+  cursor: pointer;
+}
+
+.btn.inverted {
+  background-color: #435c4f;
+  border-color: #435c4f;
+  color: white;
+}
+.btn.inverted:hover {
+  background-color: #ffffff;
+  border-color: #435c4f;
+  color: #435c4f;
+}
+
+#posts #category-title {
+  display: flex;
+  align-items: center;
+  justify-content:flex-start;
+  padding: 0;
+  margin: 0;
+  gap: 20px;
+}
+
+#follow-btn {
+  font-size: x-small;
+  font-weight:800;
+  min-width:9em;
 }
 
 #login {
@@ -925,7 +980,6 @@ input::placeholder, textarea::placeholder {
 }
 
 /*------------------------ {DELETE ACCOUNT} ------------------------*/
-
 .delete-account-form {
   background-color: #f8f9fa;
   border: 1px solid #ddd;
@@ -1086,6 +1140,116 @@ input::placeholder, textarea::placeholder {
   margin-top: 0.5rem;
   font-size: 0.875rem;
   margin-bottom: 1rem;
+}
+
+.show {
+  display: block !important;
+}
+
+/*------------------------ {DELETE COMMENT} ------------------------*/
+.delete-comment-btn {
+  display: inline-flex;
+  align-items: center;
+  background-color: #dc2626;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #dc2626;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.delete-comment-btn:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.delete-comment-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #fee2e2;
+}
+
+.delete-comment-btn:disabled {
+  background-color: #fca5a5;
+  border-color: #fca5a5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.delete-comment-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 350px;
+  width: 90%;
+  z-index: 1000;
+}
+
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.delete-comment-modal-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.delete-comment-modal-message {
+  margin-bottom: 1.25rem;
+  color: #4b5563;
+  line-height: 1.4;
+  font-size: 0.875rem;
+}
+
+.delete-comment-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.delete-comment-modal-cancel {
+  background-color: #e5e7eb;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.75rem;
+}
+
+.delete-comment-modal-cancel:hover {
+  background-color: #d1d5db;
+}
+
+.delete-comment-error {
+  display: none;
+  background-color: #fee2e2;
+  border: 1px solid #f87171;
+  color: #991b1b;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .show {

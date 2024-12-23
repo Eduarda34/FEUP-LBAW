@@ -7,7 +7,14 @@
 <section id="content_body">
     <section id="posts" class="left-panel">
         @if ($feedType == 'category')
-            <h2>{{ $category->name }}</h2>
+            <div id="category-title">
+                <h2>{{ $category->name }}</h2>
+                @if ($category->users()->where('user_id', Auth::id())->exists())
+                    <span id="follow-btn" class="btn inverted" data-id="{{ $category->category_id }}">Unfollow</span>
+                @else
+                    <span id="follow-btn" class="btn" data-id="{{ $category->category_id }}">Follow</span>
+                @endif
+            </div>
         @else
             <h2>TRENDING NEWS</h2>
         @endif

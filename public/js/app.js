@@ -13,6 +13,11 @@ function addEventListeners() {
     if (favoriteIcon != null) {
         favoriteIcon.addEventListener('click', toggleFavorite);
     }
+
+    let followBtn = document.querySelector('#posts #category-title #follow-btn');
+    if (followBtn != null) {
+        followBtn.addEventListener('click', toggleFollowCategory);
+    }
 }
   
   function encodeForAjax(data) {
@@ -154,6 +159,37 @@ function handleFavoriteResponse() {
     favoriteIcon.classList.toggle('filled');
   } else {
     console.error('Failed to update favorite status:', this.status, this.responseText.error);
+  }
+}
+
+/* %%%%%%%%%%%%%%%%%%%%%% FOLLOW/UNFOLLOW CATEGORY %%%%%%%%%%%%%%%%%%%%%% */
+function toggleFollowCategory(event) {
+  event.preventDefault();
+
+  let followBtn = event.target;
+  let categoryId = followBtn.getAttribute('data-id');
+  let action = followBtn.classList.contains('inverted') ? 'DELETE' : 'POST';
+  
+  sendAjaxRequest(action, `/api/users/categories/${categoryId}`, {}, handleFollowCategoryResponse);
+}
+
+function handleFollowCategoryResponse() {
+  if (this.status === 200 || this.status === 201) {
+    // Parse the JSON response
+    let response = JSON.parse(this.responseText);
+
+    let followBtn = document.querySelector('#posts #category-title #follow-btn');
+
+    // Toggle the class and the text on the button
+    if (followBtn.classList.contains('inverted')) {
+        followBtn.classList.remove('inverted');
+        followBtn.textContent = 'Follow';
+    } else {
+        followBtn.classList.add('inverted');
+        followBtn.textContent = 'Unfollow';
+    }
+  } else {
+    console.error('Error following/unfollowing category:', this.status, this.responseText);
   }
 }
   

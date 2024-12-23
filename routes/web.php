@@ -68,7 +68,7 @@ Route::controller(UserController::class)->group(function () {
     Route::delete('/api/users/{id}', 'delete');
     Route::put('/api/users/{id}/edit', 'update');
     Route::post('/api/users/{id}/follow', 'follow');
-    Route::delete('/api/users/{id}/unfollow', 'unfollow');
+    Route::delete('/api/users/{id}/follow', 'unfollow');
     Route::post('api/users/{id}/report', 'report');
     Route::put('api/users/notifications/{notification_id}', 'viewNotification');
     Route::delete('api/users/notifications/{notification_id}', 'deleteNotification');
@@ -96,6 +96,7 @@ Route::controller(PostController::class)->group(function () {
     Route::post('/api/posts/{post_id}/favorites', 'addToFavorites')->name('posts.favorites.add');
     Route::delete('/api/posts/{post_id}/favorites', 'removeFromFavorites')->name('posts.favorites.remove');
     Route::post('api/posts/{post_id}/report', 'report');
+    Route::delete('/comments/{comment}', 'CommentController@delete')->name('comments.delete');
     // System Manager
     Route::delete('/sys/posts/{post_id}', 'forceDelete');
 });

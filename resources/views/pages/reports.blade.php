@@ -4,10 +4,22 @@
 
 @section('content')
 
-<h2>Reports</h2>
-<section id="content_body">
+
+<section id="reports">
     <section id="cards">
-        @each('partials.report', $reports, 'report')
+    <h2>Reports to resolve</h2>
+        @if($unresolvedReports->isEmpty())
+            <p>No unresolved reports.</p>
+        @else
+            @each('partials.report', $unresolvedReports, 'report')
+        @endif
+
+    <h2>Resolved reports</h2>
+        @if($resolvedReports->isEmpty())
+            <p>No resolved reports.</p>
+        @else
+            @each('partials.report', $resolvedReports, 'report')
+        @endif
     </section>
 
     <section id="categories">

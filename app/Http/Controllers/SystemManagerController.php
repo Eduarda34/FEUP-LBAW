@@ -31,20 +31,6 @@ class SystemManagerController extends Controller
                 ->setStatusCode(403);
         }
 
-        /* $userReports = UserReport::all();
-        $postReports = PostReport::all();
-        $commentReports = CommentReport::all();
-
-        $reports = $userReports
-            ->concat($postReports)
-            ->concat($commentReports)
-            ->sortBy(function ($report) {
-                return [
-                    $report->resolved_time ?? PHP_INT_MIN,
-                    $report->time
-                ];
-            }); */
-
         $reports = Report::all()
             ->sortBy(function ($report) {
                 return [
@@ -53,10 +39,15 @@ class SystemManagerController extends Controller
                 ];
             });
 
+        $unresolvedReports = Report::whereNull('resolved_time')->get();
+
+        $resolvedReports = Report::whereNotNull('resolved_time')->get();
+        
         $blocked = BlockedUser::all();
 
         return view('pages.reports', [
-            'reports' => $reports,
+            'unresolvedReports' => $unresolvedReports,
+            'resolvedReports' => $resolvedReports,
             'blocked' => $blocked
         ]);
     }

@@ -340,6 +340,29 @@ article.post footer .vote-icon {
   margin-left: 1em;
 }
 
+#reports {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  margin-top: 2em;
+  margin-left: 3em;
+}
+
+#reports > #cards {
+  margin-right: 3em;
+}
+
+#reports > #cards > .card {
+  border: #005237;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 2px;
+  margin: 5px;
+}
+
+.card .card {
+  padding: 5px;
+}
+
 #about_body > h3 {
   font-size: larger;
   padding-left: 3em;

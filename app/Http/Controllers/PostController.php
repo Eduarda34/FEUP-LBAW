@@ -35,6 +35,37 @@ class PostController extends Controller
         return $posts;
     }
 
+    private function getCustomPosts()
+    {
+        $userId = Auth::id();
+
+        return Post::query()
+            // Join with post categories
+            ->leftJoin('post_categories', 'posts.post_id', '=', 'post_categories.post_id')
+            // Join with categories the user follows
+            ->leftJoin('user_category', function ($join) use ($userId) {
+                $join->on('post_categories.category_id', '=', 'user_category.category_id')
+                    ->where('user_category.user_id', '=', $userId);
+            })
+            // Join with followed users
+            ->leftJoin('follows', function ($join) use ($userId) {
+                $join->on('posts.user_id', '=', 'follows.followed_id')
+                    ->where('follows.follower_id', '=', $userId);
+            })
+            ->select('posts.*')
+            ->whereNotIn('posts.user_id', BlockedUser::query()->select('blocked_id'))
+            ->orderByRaw('
+                CASE 
+                    WHEN follows.follower_id IS NOT NULL AND user_category.user_id IS NOT NULL THEN 1 -- Followed user + followed category
+                    WHEN follows.follower_id IS NOT NULL THEN 2 -- Followed user
+                    WHEN user_category.user_id IS NOT NULL THEN 3 -- Followed category
+                    ELSE 4 -- Everything else
+                END
+            ')
+            ->orderBy('posts.created_at', 'desc') // Fallback to recency
+            ->get();
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -42,13 +73,17 @@ class PostController extends Controller
     {
         // Determine the feed type from the query parameter.(Default 'recent')
         if (!Auth::check()) {
-            $feedType = 'recent';
+            if ($request->query('feed') == 'recent' || $request->query('feed') == 'popular') {
+                $feedType = $request->query('feed');
+            } else {
+                $feedType = 'recent';
+            }
         } else {
             if (Auth::user()->blocked) {
                 // User blocked, redirect to logout.
                 return redirect('/logout');
             }
-            $feedType = $request->query('feed', 'recent');
+            $feedType = $request->query('feed', 'custom');
         }
 
         // Fetch posts based on the feed type.
@@ -56,8 +91,8 @@ class PostController extends Controller
             case 'popular':
                 $posts = $this->getPopularPosts();
                 break;
-            case 'recommended':
-                // TODO
+            case 'custom':
+                $posts = $this->getCustomPosts();
                 break;
             case 'recent':
             default:

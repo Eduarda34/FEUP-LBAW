@@ -84,7 +84,8 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     reputation INT DEFAULT 0,
     profile_picture VARCHAR(255),
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    remember_token VARCHAR
 );
 
 -- System Managers table
@@ -417,12 +418,14 @@ $BODY$
     DECLARE
         new_notification_id INT;
     BEGIN
-        INSERT INTO notifications (user_id)
-        VALUES ((SELECT user_id FROM posts WHERE post_id = NEW.post_id))
-        RETURNING notification_id INTO new_notification_id;
+        IF (SELECT user_id FROM posts WHERE post_id = NEW.post_id) IS DISTINCT FROM NEW.user_id THEN
+            INSERT INTO notifications (user_id)
+            VALUES ((SELECT user_id FROM posts WHERE post_id = NEW.post_id))
+            RETURNING notification_id INTO new_notification_id;
 
-        INSERT INTO comment_notification (notification_id, post_id, comment_id)
-        VALUES (new_notification_id, NEW.post_id, NEW.comment_id);
+            INSERT INTO comment_notification (notification_id, post_id, comment_id)
+            VALUES (new_notification_id, NEW.post_id, NEW.comment_id);
+        END IF;
 
         RETURN NEW;
     END;

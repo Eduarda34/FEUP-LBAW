@@ -6,20 +6,53 @@
 
 <section id="content_body">
     <section id="posts" class="left-panel">
-        @if ($feedType == 'category')
-            <div id="category-title">
-                <h2>{{ $category->name }}</h2>
-                @if ($category->users()->where('user_id', Auth::id())->exists())
-                    <span id="follow-category-btn" class="btn inverted" data-id="{{ $category->category_id }}">Unfollow</span>
-                @else
-                    <span id="follow-category-btn" class="btn" data-id="{{ $category->category_id }}">Follow</span>
-                @endif
-            </div>
-        @elseif ($feedType == 'favorites') 
-            <h2>FAVORITE NEWS</h2>
-        @else
-            <h2>TRENDING NEWS</h2>
-        @endif
+        <header>
+            @if ($feedType == 'category')
+                <div id="category-title">
+                    <h2>{{ $category->name }}</h2>
+                    @if ($category->users()->where('user_id', Auth::id())->exists())
+                        <span id="follow-category-btn" class="btn inverted" data-id="{{ $category->category_id }}">Unfollow</span>
+                    @else
+                        <span id="follow-category-btn" class="btn" data-id="{{ $category->category_id }}">Follow</span>
+                    @endif
+                </div>
+            @elseif ($feedType == 'favorites') 
+                <h2>FAVORITE NEWS</h2>
+            @else
+                <h2>TRENDING NEWS</h2>
+            @endif
+
+            <!-- Filter Bar -->
+            <nav id="feed-filter">
+                <ul>
+                    @if (!in_array($feedType, ['popular', 'custom', 'recent']))
+                        <li>
+                            <span class="active">{{ ucfirst($feedType) }}</span>
+                        </li>
+                    @endif
+                    <li>
+                        <a href="{{ url('/posts?feed=popular') }}" 
+                           class="{{ $feedType == 'popular' ? 'active' : '' }}">
+                            Popular
+                        </a>
+                    </li>
+                    @if (Auth::check())
+                        <li>
+                            <a href="{{ url('/posts?feed=custom') }}" 
+                            class="{{ $feedType == 'custom' ? 'active' : '' }}">
+                                Custom
+                            </a>
+                        </li>
+                    @endif
+                    <li>
+                        <a href="{{ url('/posts?feed=recent') }}" 
+                           class="{{ $feedType == 'recent' ? 'active' : '' }}">
+                            Recent
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
 
         @if (Auth::check())
             <!-- Button to link to the create post page -->

@@ -646,7 +646,7 @@ class PostController extends Controller
         // Add the report to the `post_report` table.
         $postReport = new PostReport();
         $postReport->report_id = $report->report_id;
-        $postReport->reported_id = $reportedPost->id;
+        $postReport->post_id = $reportedPost->post_id;
         $postReport->save();
 
         return redirect()->back()->with('success', 'Report created successfully.')->setStatusCode(201);;

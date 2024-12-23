@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Models\Post;
+use App\Models\Category;
 
 class BreadcrumbServiceProvider extends ServiceProvider
 {
@@ -70,6 +71,17 @@ class BreadcrumbServiceProvider extends ServiceProvider
             // Create post
             if (request()->routeIs('posts.create')) {
                 $breadcrumbs[] = ['title' => 'Create your post', 'url' => null];
+            }
+
+            // ------------------ CATEGORIES ----------------- //
+
+            // List posts by category
+            if (request()->routeIs('posts.category')) {
+                $categoryId = request()->route('category_id');
+                $category = Category::find($categoryId);
+                if ($category) {
+                    $breadcrumbs[] = ['title' => $category->name, 'url' => null];
+                }
             }
 
             // -------------------- ADMIN -------------------- //

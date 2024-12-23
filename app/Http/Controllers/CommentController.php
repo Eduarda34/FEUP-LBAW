@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\CommentVote;
+use App\Models\Reply;
 use App\Models\Report;
 use App\Models\CommentReport;
 use Illuminate\Http\Request;
@@ -356,28 +357,32 @@ class CommentController extends Controller
             return redirect('/logout');
         }
         
-        // Create a blank new comment.
-        $reply = new Comment();
-
         // Get parent comment.
         $comment = Comment::findOrFail($comment_id);
-
+        
         // Check if the current user is authorized to create this reply.
-        $this->authorize('reply', $reply);
-
+        $this->authorize('reply', $comment);
+        
         $request->validate([
             'body' => 'required|max:2000'
-           ]);
+        ]);
         
+        // Create a blank new comment.
+        $comment_reply = new Comment();
         // Set reply details.
-        $reply->body = $request->input('body');
-        $reply->user_id = Auth::user()->id;
-        $reply->post_id = $comment->post_id;
+        $comment_reply->body = $request->input('body');
+        $comment_reply->user_id = Auth::user()->id;
+        $comment_reply->post_id = $comment->post_id;
+        $comment_reply->timestamps = false; // Disable timestamps temporarily
+        $comment_reply->save();
+        $comment_reply->timestamps = true;
+        
+        $reply = new Reply();
         $reply->parent_comment_id = $comment->comment_id;
-
-        // Save the comment and return it as JSON.
+        $reply->comment_id = $comment_reply->comment_id;
         $reply->save();
-        return response()->json($reply);
+
+        return redirect('posts/'.$comment_reply->post_id);
     }
     
     /**

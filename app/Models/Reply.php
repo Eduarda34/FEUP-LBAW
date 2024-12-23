@@ -13,6 +13,8 @@ class Reply extends Model
 
     public $timestamps = false;
 
+    public $incrementing = false;
+
     /**
      * Get the parent comment for this reply relationship.
      */

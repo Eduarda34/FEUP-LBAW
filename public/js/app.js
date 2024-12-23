@@ -33,6 +33,11 @@ function addEventListeners() {
     [].forEach.call(checkboxes, function(checkbox) {
         checkbox.addEventListener('change', markAsViewed);
     });
+
+    let toggleRepliesIcons = document.querySelectorAll('.comment-footer .comments .vote-icon');
+    [].forEach.call(toggleRepliesIcons, function(icon) {
+        icon.addEventListener('click', toggleReplies);
+    });
 }
   
   function encodeForAjax(data) {
@@ -281,15 +286,29 @@ function handleMarkAsViewedResponse() {
       if (response.notification_id && response.viewed) {
           // Find the notification element by its data-id
           let notificationElement = document.querySelector(`.notification[data-id="${response.notification_id}"]`);
+          let notificationAnchor = notificationElement.closest('a');
           // Find the target list based on the viewed status
           let targetList = response.viewed == "1" ? document.getElementById('notifications-viewed') : document.getElementById('notifications-not-viewed');
           // Move the notification to the appropriate list
           if (notificationElement) {
-              targetList.appendChild(notificationElement);
+              targetList.appendChild(notificationAnchor);
           }
       }
   } else {
       console.error('Error marking notification as viewed:', this.status, this.responseText.error);
+  }
+}
+
+/* %%%%%%%%%%%%%%%%%%%%%% DISPLAY REPLIES %%%%%%%%%%%%%%%%%%%%%% */
+function toggleReplies(event) {
+  let commentFooter = event.target.closest('.comment-footer');
+  if (commentFooter) {
+      let commentId = commentFooter.parentElement.getAttribute('data-id');
+      
+      let repliesDiv = document.querySelector(`.replies[data-id="${commentId}"]`);
+      if (repliesDiv) {
+          repliesDiv.style.display = repliesDiv.style.display === 'none' ? 'block' : 'none';
+      }
   }
 }
   

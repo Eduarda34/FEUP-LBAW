@@ -860,6 +860,10 @@ input[type=password]:focus {
   align-items: center;
   gap: 40px;
 }
+#post .comment-section .replies {
+  margin-left: 3em;
+  display: none;
+}
 
 .author {
   font-size: 16px;

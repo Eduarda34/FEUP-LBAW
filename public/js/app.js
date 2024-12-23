@@ -14,10 +14,15 @@ function addEventListeners() {
         favoriteIcon.addEventListener('click', toggleFavorite);
     }
 
-    let followBtn = document.querySelector('#posts #category-title #follow-btn');
-    if (followBtn != null) {
-        followBtn.addEventListener('click', toggleFollowCategory);
+    let followCategoryBtn = document.querySelector('#posts #category-title #follow-category-btn');
+    if (followCategoryBtn != null) {
+      followCategoryBtn.addEventListener('click', toggleFollowCategory);
     }
+
+    let followBtns = document.querySelectorAll('#follow-btn');
+    [].forEach.call(followBtns, function(btn) {
+        btn.addEventListener('click', toggleFollowUser);
+    });
 }
   
   function encodeForAjax(data) {
@@ -162,6 +167,39 @@ function handleFavoriteResponse() {
   }
 }
 
+/* %%%%%%%%%%%%%%%%%%%%%% FOLLOW/UNFOLLOW USER %%%%%%%%%%%%%%%%%%%%%% */
+function toggleFollowUser(event) {
+  event.preventDefault();
+
+  let followBtn = event.target;
+  let userId = followBtn.getAttribute('data-id');
+  let action = followBtn.classList.contains('inverted') ? 'DELETE' : 'POST';
+  
+  sendAjaxRequest(action, `/api/users/${userId}/follow`, {}, handleFollowUserResponse);
+}
+
+function handleFollowUserResponse() {
+  if (this.status === 200 || this.status === 201) {
+    // Parse the JSON response
+    let response = JSON.parse(this.responseText);
+    // Ensure the response contains the required data
+    if (response.user_id) {
+      let followBtn = document.querySelector(`#follow-btn[data-id="${response.user_id}"]`);
+
+      // Toggle the class and the text on the button
+      if (followBtn.classList.contains('inverted')) {
+          followBtn.classList.remove('inverted');
+          followBtn.textContent = 'Follow';
+      } else {
+          followBtn.classList.add('inverted');
+          followBtn.textContent = 'Unfollow';
+      }
+    }
+  } else {
+    console.error('Error following/unfollowing user:', this.status, this.responseText);
+  }
+}
+
 /* %%%%%%%%%%%%%%%%%%%%%% FOLLOW/UNFOLLOW CATEGORY %%%%%%%%%%%%%%%%%%%%%% */
 function toggleFollowCategory(event) {
   event.preventDefault();
@@ -178,7 +216,7 @@ function handleFollowCategoryResponse() {
     // Parse the JSON response
     let response = JSON.parse(this.responseText);
 
-    let followBtn = document.querySelector('#posts #category-title #follow-btn');
+    let followBtn = document.querySelector('#posts #category-title #follow-category-btn');
 
     // Toggle the class and the text on the button
     if (followBtn.classList.contains('inverted')) {

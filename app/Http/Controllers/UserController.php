@@ -126,12 +126,14 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|max:50|unique:users,username,' . $user->id,
             'email' => 'required|email|max:250|unique:users,email,' . $user->id,
+            'bio' => 'nullable|string|max:300',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         // Update the user's information
         $user->username = $request->input('username');
         $user->email = $request->input('email');
+        $user->bio = $request->input('bio');
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $path = $file->store('user', 'public'); // Store in the "storage/app/public/user" directory
@@ -187,11 +189,15 @@ class UserController extends Controller
 
         $this->authorize('follow', $user);
 
-        $isFollowed = $user->followers()->where('follower_id', Auth::user()->id)->exists();
+        $isFollowed = $user->followers()->where('id', Auth::id())->exists();
 
         if (!$isFollowed) {
-            Auth::user()->followers()->attach($user->id);
+            Auth::user()->following()->attach($user->id);
         }
+
+        return response()->json([
+            'user_id' => $user->id,
+        ], 201);
     }
 
     /**
@@ -213,11 +219,15 @@ class UserController extends Controller
         
         $this->authorize('unfollow', $user);
 
-        $isFollowed = $user->followers()->where('follower_id', Auth::user()->id)->exists();
-
+        $isFollowed = $user->followers()->where('id', Auth::id())->exists();
+        
         if ($isFollowed) {
-            Auth::user()->followers()->detach($user->id);
+            Auth::user()->following()->detach($user->id);
         }
+
+        return response()->json([
+            'user_id' => $user->id,
+        ], 200);
     }
 
     /**

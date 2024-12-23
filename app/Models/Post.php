@@ -59,4 +59,13 @@ class Post extends Model
     public function reports(): HasMany {
         return $this->hasMany(PostReport::class, 'post_id');
     }
+
+    /**
+     * Get the news cover image.
+     */
+    public function getCoverImage(): string {
+        return $this->image 
+            ? asset('storage/' . $this->image) 
+            : asset('storage/default-news.jpg');
+    }
 }

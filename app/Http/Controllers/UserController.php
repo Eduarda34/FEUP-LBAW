@@ -373,11 +373,12 @@ class UserController extends Controller
         }
 
         // Sort by most recent.
-        $notifications = Auth::user()->notifications()->orderBy('time', 'desc')->get();
+        $unviewedNotifications = Auth::user()->notifications()->where('viewed', false)->orderBy('time', 'desc')->get();
+        $viewedNotifications = Auth::user()->notifications()->where('viewed', true)->orderBy('time', 'desc')->get();
 
-        // Render the notifications view.
         return view('pages.notifications', [
-            'notifications' => $notifications,
+            'unviewedNotifications' => $unviewedNotifications,
+            'viewedNotifications' => $viewedNotifications,
         ]);
     }
 
@@ -399,7 +400,9 @@ class UserController extends Controller
         $notification = Notification::findOrFail($notification_id);
 
         // Authorize the update action
-        $this->authorize('viewNotification', $notification);
+        if (Auth::id() !== $notification->user_id) {
+            return abort(403, 'Forbidden request');
+        }
 
         // Validate the input
         $request->validate([
@@ -410,8 +413,11 @@ class UserController extends Controller
         $notification->viewed = $request->input('viewed');
         $notification->save();
 
-        // Redirect to the notifications page
-        return redirect()->back()->with('success', 'Notification status updated successfully..')->setStatusCode(200);
+        // Return JSON response
+        return response()->json([
+            'notification_id' => $notification->notification_id,
+            'viewed' => $request->input('viewed')
+        ], 200);
     }
 
     /**
@@ -465,13 +471,18 @@ class UserController extends Controller
 
         // Get the notification by ID
         $notification = Notification::findOrFail($notification_id);
-
+        
         // Check if the current user is authorized to delete this notification.
-        $this->authorize('deleteNotification', $notification);
+        if (Auth::id() !== $notification->user_id) {
+            return abort(403, 'Forbidden request');
+        }
 
-        // Delete the notification and redirect to the notifications page.
         $notification->delete();
-        return response()->back()->with('success', 'Notification deleted successfully.')->setStatusCode(204);
+
+        // Return JSON response
+        return response()->json([
+            'notification_id' => $notification->notification_id,
+        ], 200);
     }
 
     /**

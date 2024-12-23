@@ -23,6 +23,16 @@ function addEventListeners() {
     [].forEach.call(followBtns, function(btn) {
         btn.addEventListener('click', toggleFollowUser);
     });
+
+    let deleteIcons = document.querySelectorAll('.notification .delete-notification');
+    [].forEach.call(deleteIcons, function(icon) {
+        icon.addEventListener('click', deleteNotification);
+    });
+
+    let checkboxes = document.querySelectorAll('.notification .mark-as-viewed');
+    [].forEach.call(checkboxes, function(checkbox) {
+        checkbox.addEventListener('change', markAsViewed);
+    });
 }
   
   function encodeForAjax(data) {
@@ -228,6 +238,58 @@ function handleFollowCategoryResponse() {
     }
   } else {
     console.error('Error following/unfollowing category:', this.status, this.responseText);
+  }
+}
+
+/* %%%%%%%%%%%%%%%%%%%%%% DELETE NOTIFICATION %%%%%%%%%%%%%%%%%%%%%% */
+function deleteNotification(event) {
+  event.preventDefault();
+
+  let notificationId = event.target.getAttribute('data-id');
+
+  sendAjaxRequest('DELETE', `/api/users/notifications/${notificationId}`, {}, handleDeleteNotificationResponse);
+}
+
+// Handle the response after deleting a notification
+function handleDeleteNotificationResponse() {
+  if (this.status === 200) {
+      let response = JSON.parse(this.responseText);
+
+      if (response.notification_id) {
+          let notificationItem = document.querySelector(`.notification[data-id="${response.notification_id}"]`);
+          if (notificationItem) {
+              notificationItem.remove();
+          }
+      }
+  } else {
+      console.error('Error deleting notification:', this.status, this.responseText.error);
+  }
+}
+
+/* %%%%%%%%%%%%%%%%%%%%%% VIEW/UNVIEW NOTIFICATION %%%%%%%%%%%%%%%%%%%%%% */
+function markAsViewed(event) {
+  let notificationId = event.target.getAttribute('data-id');
+  let viewed = event.target.checked ? 1 : 0;
+
+  sendAjaxRequest('PUT', `/api/users/notifications/${notificationId}`, { viewed }, handleMarkAsViewedResponse);
+}
+
+// Handle the response after marking a notification as viewed
+function handleMarkAsViewedResponse() {
+  if (this.status === 200) {
+      let response = JSON.parse(this.responseText);
+      if (response.notification_id && response.viewed) {
+          // Find the notification element by its data-id
+          let notificationElement = document.querySelector(`.notification[data-id="${response.notification_id}"]`);
+          // Find the target list based on the viewed status
+          let targetList = response.viewed == "1" ? document.getElementById('notifications-viewed') : document.getElementById('notifications-not-viewed');
+          // Move the notification to the appropriate list
+          if (notificationElement) {
+              targetList.appendChild(notificationElement);
+          }
+      }
+  } else {
+      console.error('Error marking notification as viewed:', this.status, this.responseText.error);
   }
 }
   

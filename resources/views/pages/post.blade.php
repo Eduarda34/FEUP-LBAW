@@ -99,7 +99,7 @@
                 @if ($comment->parent)
                     @continue
                 @endif
-                <div class="comment" data-id="{{ $comment->comment_id }}">
+                <div class="comment" id="comment-{{ $comment->comment_id }}" data-id="{{ $comment->comment_id }}">
                     <!-- Comment Header -->
                     <header>
                         <div>

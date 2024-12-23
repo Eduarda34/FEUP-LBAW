@@ -423,6 +423,69 @@ article.post footer .vote-icon {
   display: none;
 }
 
+/*------------------------ {NOTIFICATIONS PAGE} ------------------------*/
+#content_body > #notifications {
+  margin-right: 3em;
+}
+
+#content_body > #notifications > ul{
+  list-style: none;
+}
+#content_body > #notifications > ul > a{
+  margin: 0;
+  padding: 0;
+}
+#content_body > #notifications  .notification {
+  border: 1px solid #005237;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+}
+#content_body > #notifications  .notification p {
+  padding: 0px;
+  margin: 0px;
+}
+#content_body > #notifications  .notification:hover {
+  background-color: #f1f1f1;
+}
+#content_body > #notifications .notification .notification-buttons{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  align-content: center;
+}
+#content_body > #notifications .notification .notification-buttons > label{
+  padding: 0;
+  height: 20px;
+  width: 20px;
+  margin: 0;
+}
+.notification .notification-buttons .mark-as-viewed {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  align-self: center;
+}
+.notification .notification-buttons .delete-notification {
+  font-size: 30px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s, transform 0.3s;
+}
+.notification .notification-buttons .delete-notification:hover {
+  transform: scale(1.1);
+}
+
+.report .report-buttons{
+  display: none;
+}
+
 #about_body > h3 {
   font-size: larger;
   padding-left: 3em;

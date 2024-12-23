@@ -1,11 +1,9 @@
 <h3>SUGGESTED NEWS</h3>
 @foreach ($suggested_news as $news)
     <div id="suggested-item">
-        @if ($news->image)
-            <div class="news-image-container">
-                <img src="{{ asset('storage/' . $news->image) }}" alt="News Cover Image" class="news-image-small">
-            </div>
-        @endif
+        <div class="news-image-container">
+            <img src="{{ $news->getCoverImage() }}" alt="News Cover Image" class="news-image-small">
+        </div>
         <div class="news-information">
             <a href="{{ route('posts.show', $news->post_id) }}" class="suggested-title">{{ strtoupper($news->title) }}</a>
             <p class="author">

@@ -3,7 +3,7 @@
 @section('title', 'Edit' . $user->username . 'profile')
 
 @section('content')
-    <section id="profile-container">
+    <section id="profile-editor-container">
         <h2>Edit Profile: {{ $user->username }}</h2>
 
         <form action="{{ url('/api/users/' . $user->id . '/edit') }}" method="POST" enctype="multipart/form-data">
@@ -49,6 +49,21 @@
                 <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required>
                 @error('email')
                     <div class="error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <!-- Bio Field -->
+            <div>
+                <label for="bio">Bio</label>
+                <textarea 
+                    id="bio" 
+                    name="bio" 
+                    rows="5"  
+                    maxlength="300" 
+                    placeholder="Enter the bio to show in your profile (optional)"
+                >{{ old('bio', $user->bio) }}</textarea>
+                @error('bio')
+                    <div class="error text-danger">{{ $message }}</div>
                 @enderror
             </div>
 

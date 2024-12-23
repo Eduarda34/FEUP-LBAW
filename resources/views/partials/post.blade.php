@@ -1,9 +1,7 @@
 <article class="post" data-id="{{ $post->post_id }}">
-    @if ($post->image)
-        <div class="news-image-container">
-            <img src="{{ asset('storage/' . $post->image) }}" alt="News Cover Image" class="news-image">
-        </div>
-    @endif
+    <div class="news-image-container">
+        <img src="{{ $post->getCoverImage() }}" alt="News Cover Image" class="news-image">
+    </div>
     <section id="categories">
         @foreach ($post->categories as $category)
             <a href="{{ route('posts.category', $category->category_id)}}">{{$category->name}}</a>

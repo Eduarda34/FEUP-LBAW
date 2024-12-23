@@ -8,7 +8,13 @@
                 <a href="{{ route('comments.edit', $comment->comment_id) }}" class="edit">[edit]</a>
             @endif
         </div>
-        <span class="comment-time">{{ \Carbon\Carbon::parse($comment->created_at)->format('h:i A | F d') }}</span>
+        <span class="comment-time">
+            @if ($comment->updated_at)
+                Edited at {{ \Carbon\Carbon::parse($comment->updated_at)->format('h:i A | F d') }}
+            @else
+                {{ \Carbon\Carbon::parse($comment->created_at)->format('h:i A | F d') }}
+            @endif
+        </span>
     </header>
 
     <!-- Comment Body -->

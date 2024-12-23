@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,9 +33,12 @@ class SearchController extends Controller
 
         $posts = Post::whereRaw("to_tsvector('english', title || ' ' || body) @@ plainto_tsquery('english', ?)", [$query])->get();
 
+        $categories = Category::all();
         // Render the posts view.
         return view('pages.posts', [
-            'posts' => $posts
+            'posts' => $posts,
+            'feedType' => 'Search:"'.$query.'"',
+            'categories' => $categories
         ]);
     }
 
@@ -67,9 +71,11 @@ class SearchController extends Controller
                 'error' => 'User not found.'
             ], 404);
         }
+        $posts = $user->posts()->get();
         // Render the posts view.
         return view('pages.user', [
-            'user' => $user
+            'user' => $user,
+            'posts' =>$posts
         ]);
     }
 }

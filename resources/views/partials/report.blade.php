@@ -31,5 +31,23 @@
         @if (isset($report->resolved_time))
             <p>Resolved at: {{ \Carbon\Carbon::parse($report->resolved_time)->format('d/m/Y H:i') }}</p>
         @endif
+
+        <!-- Delete content when its not a parent to any value -->
+        @if (!isset($report->comment) && !isset($report->post->comments) && !isset($report->post->likes))
+            <form action="{{ route('sys.postDelete', $report->report_id) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">Delete Content</button>
+            </form>
+        @endif
+
+        <!-- Block user -->
+        @if (isset($report->user))
+            <form action="{{ route('system.users.block', $report->user->reported->id) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('POST')
+                <button type="submit" class="btn btn-warning">Block User</button>
+            </form>
+        @endif
     </div>
 </article>

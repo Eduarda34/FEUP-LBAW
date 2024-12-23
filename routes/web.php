@@ -98,7 +98,7 @@ Route::controller(PostController::class)->group(function () {
     Route::post('api/posts/{post_id}/report', 'report');
     Route::delete('/comments/{comment}', 'CommentController@delete')->name('comments.delete');
     // System Manager
-    Route::delete('/sys/posts/{post_id}', 'forceDelete');
+    Route::delete('/sys/posts/{post_id}', 'forceDelete')->name('sys.postDelete');
 });
 
 // Comments
@@ -119,8 +119,8 @@ Route::controller(CommentController::class)->group(function () {
 
 //System Manager
  Route::controller(SystemManagerController::class)->group(function () {
-    Route::put('/sys/users/{id}/block', 'blockUser')->name('system.users.block');
-    Route::put('/sys/users/{id}/unblock', 'unblockUser')->name('system.users.unblock');
+    Route::post('/sys/users/{id}/block', 'blockUser')->name('system.users.block');
+    Route::delete('/sys/users/{id}/unblock', 'unblockUser')->name('system.users.unblock');
     Route::get('/sys/reports', 'listReports')->name('system.reports.list');
     Route::put('/sys/reports/{report_id}/resolve', 'resolveReport')->name('system.reports.resolve');
     Route::post('/sys/categories', 'addCategory')->name('system.categories.add');

@@ -916,12 +916,12 @@ END TRANSACTION; */
 
 -- Populate
 
-INSERT INTO users (username, email, password, created_at) VALUES 
-    ('admin', 'admin@lbaw2484.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
-    ('johndoe', 'johndoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
-    ('janedoe', 'janedoe@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
-    ('alice', 'alice@example.com', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW()),
-    ('Cristiano', 'cristiano_cr7_ronaldo@goat.pt', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW());
+INSERT INTO users (username, email, bio, password, created_at, profile_picture) VALUES 
+    ('admin', 'admin@lbaw2484.com', NULL, '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW(), NULL),
+    ('johndoe', 'johndoe@example.com', NULL, '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW(), NULL),
+    ('janedoe', 'janedoe@example.com', NULL, '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW(), NULL),
+    ('alice', 'alice@example.com', NULL, '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW(), NULL),
+    ('Cristiano', 'cristiano_cr7_ronaldo@goat.pt', 'I’m Cristiano Ronaldo, a professional footballer from Portugal, known for my relentless dedication, passion for the game, and drive to push boundaries. Over the years, I’ve been fortunate to represent some of the world’s greatest football clubs, including Sporting CP, Manchester United, Real Madrid, Juventus, and Al-Nassr, as well as proudly captaining the Portuguese national team. With a career filled with memorable goals, record-breaking achievements, and countless trophies, my journey has always been about striving for excellence both on and off the pitch. Whether it’s winning Ballon d’Ors, Champions Leagues, or inspiring the next generation, I give my all to every challenge. Outside football, I’m a father, a philanthropist, and someone who believes in hard work, perseverance, and chasing dreams. Every day, I aim to live up to the expectations of my fans, my family, and myself.', '$2y$10$hS16qSDuvdhQvpKyNqmGOOgCtNJ3t7pQwijhQvUAgSzNb7BhegE7C', NOW(), 'user/6yGXIM4a7vE3D6uQBJfQwkrN3kvaoui2M01VF5kn.jpg');
 
 INSERT INTO system_managers (sm_id) VALUES (1);
 
@@ -936,24 +936,74 @@ INSERT INTO user_category (user_id, category_id) VALUES
     (2, 2),
     (3, 3);
 
-INSERT INTO posts (user_id, title, synopsis, body, created_at) VALUES 
+INSERT INTO posts (user_id, title, synopsis, body, created_at, image) VALUES 
     (5, 'Latest in AI Technology',
         'AI continues to reshape industries, with breakthroughs in generative content, robotics, and daily life applications. Highlights include advancements in AI-driven creativity, general-purpose robotics, and transformative consumer technologies.',
         'The integration of generative AI into media production has reached new heights. Tools like Runway’s latest video models are producing near-cinematic quality clips in seconds. Major film studios, including Paramount, are exploring generative AI for multilingual lip-syncing and realistic visual effects, signaling a shift in filmmaking techniques. Meanwhile, AI-driven platforms like Synthesia are enabling corporations to generate hyper-realistic avatars, used for everything from marketing to training materials. Inspired by the success of multimodal models like OpenAI’s GPT-4, roboticists are building general-purpose robots capable of handling diverse tasks. These AI systems can perform anything from flipping pancakes to opening doors, with applications ranging from household assistance to industrial automation. Models like DeepMind’s “Robocat” exemplify this progress, merging data self-generation with task versatility. 2024 has seen a surge in consumer-friendly AI applications, such as the Yarbo S1 Plus, an AI-powered snow blower, that autonomously clears driveways with precision mapping and obstacle avoidance, the Anura MagicMirror, that uses AI to assess health metrics like blood pressure and stress levels via facial analysis, bringing medical insights into homes, and AI-integrated pillows and mattresses created by companies like DeRucci, that adjust dynamically to improve sleep quality and reduce snoring. As AI becomes more pervasive, ethical dilemmas and challenges in disinformation management loom large. Generative AI tools, while impressive, also risk being weaponized for fake news and election disinformation. Efforts to counteract these threats, such as watermarking systems like DeepMind’s SynthID, remain in their infancy. The year ahead promises further integration of AI into daily life, but as these innovations expand, ensuring responsible deployment will be a critical focus for researchers and developers.',
-        '2024-11-21 18:31:35.42877'),
+        '2024-11-21 18:31:35.42877', 'post/xSnmONGsPhpEwDqvwsBvIuyx3s5dyTkNbtNGW1VJ.jpg'),
     (2, 'Breakthroughs in Quantum Computing',
         'Quantum computing is edging closer to practical applications with groundbreaking advancements in hardware, algorithms, and error correction. These developments are setting the stage for solving problems that were once deemed impossible for classical computers.',
         'In a significant leap, IBM unveiled its latest quantum processor, "Condor Q," featuring 1,121 qubits. This processor is not just a demonstration of scaling but a step towards achieving quantum advantage—where quantum computers outperform classical counterparts in meaningful tasks. The chip boasts increased stability and improved connectivity between qubits, which are vital for tackling complex computations such as molecular simulations and optimization problems. IBM’s roadmap also hints at systems exceeding 10,000 qubits within the decade. Meanwhile, Google’s Quantum AI lab showcased "Sycamore 2," capable of simulating chemical reactions with unparalleled accuracy. These simulations promise to revolutionize drug discovery and material science, offering real-world applications in medicine and green energy. One of the most significant barriers to scalable quantum computing—error correction—is being tackled aggressively. Researchers at MIT recently demonstrated a fault-tolerant qubit design that dramatically reduces error rates. This approach, leveraging "logical qubits" built from multiple physical qubits, ensures computational reliability over extended periods. Experts believe this breakthrough brings us closer to practical quantum cryptography and secure communications. Similarly, Microsoft’s topological qubit research made headlines. Their system uses a unique approach to qubit stability, potentially eliminating the need for complex error correction mechanisms. If successful, this innovation could drastically simplify quantum computing architectures. Quantum computing is no longer confined to academic research. Startups like Rigetti Computing and D-Wave Systems are partnering with industries to solve optimization problems in logistics, finance, and energy. For example, Volkswagen is using quantum algorithms to optimize traffic flow in major cities, while JP Morgan Chase explores quantum solutions for risk analysis and portfolio optimization. Furthermore, governments are taking notice. The European Union, the United States, and China have all announced multi-billion-dollar quantum initiatives to remain competitive in the global race for quantum supremacy. Despite these breakthroughs, challenges remain. Quantum systems still require extremely low temperatures to operate, and scaling hardware to accommodate thousands of qubits remains a hurdle. Nonetheless, the pace of innovation and investment in this field suggests a future where quantum computing will unlock solutions to humanity’s most complex challenges. With every milestone, quantum computing edges closer to transforming industries and reshaping our understanding of computation. The next decade will undoubtedly be pivotal in determining the technology’s ultimate impact.',
-        '2024-11-21 18:31:35.42877'),
+        '2024-11-21 18:31:35.42877', NULL),
     (4, 'Health Benefits of a Balanced Diet',
         'A balanced diet is the cornerstone of good health, offering numerous benefits from improved immunity to enhanced mental clarity. By incorporating a variety of nutrient-rich foods, individuals can achieve long-term well-being and prevent chronic diseases.',
         'Eating a balanced diet provides the essential nutrients your body needs to function optimally. This includes macronutrients like proteins, carbohydrates, and fats, as well as vital micronutrients such as vitamins and minerals. Consuming these nutrients in appropriate proportions strengthens the immune system, supports cell regeneration, and fuels energy production. For example, whole grains and lean proteins are key for sustained energy, while fruits and vegetables supply antioxidants that combat oxidative stress, reducing the risk of diseases like cancer and heart conditions. What you eat can significantly impact your mental health. Research highlights the role of omega-3 fatty acids, found in fish, nuts, and seeds, in reducing symptoms of depression and anxiety. Similarly, diets rich in B vitamins—available in leafy greens, eggs, and legumes—help regulate brain function and prevent mood swings. The Mediterranean diet, celebrated for its balance of healthy fats, fiber, and fresh produce, has been linked to lower rates of cognitive decline and improved memory, emphasizing the mind-body connection fostered by balanced eating. A diet high in processed foods and refined sugars can significantly increase the risk of obesity, diabetes, and cardiovascular diseases. Conversely, adopting a balanced diet filled with fiber, healthy fats, and lean proteins can help reduce these risks. For heart health, incorporating foods rich in monounsaturated fats, such as avocados, salmon, and olive oil, can improve cholesterol levels and lower the likelihood of developing heart disease. Similarly, for managing diabetes, consuming whole grains and low-glycemic fruits like berries helps stabilize blood sugar levels, reducing spikes that may lead to insulin resistance. Maintaining a healthy weight is easier with a balanced diet. Fiber-rich foods like oats, beans, and vegetables promote satiety, preventing overeating. Additionally, balanced meals provide consistent energy levels, avoiding the sugar crashes associated with high-calorie, low-nutrient foods. To maintain a balanced diet, it’s important to incorporate variety by including a range of colorful fruits and vegetables, ensuring you get a broad spectrum of essential nutrients. Paying attention to portion sizes can help prevent overeating and support healthy weight management. Prioritizing whole, unprocessed foods over highly processed options reduces your intake of added sugars and unhealthy fats. Staying hydrated by drinking plenty of water is also crucial, as it supports digestion, nutrient absorption, and overall body function. Together, these strategies contribute to a sustainable and healthful eating pattern. The benefits of a balanced diet extend beyond physical well-being. By embracing healthy eating habits, individuals can enjoy a higher quality of life, better productivity, and reduced healthcare costs. Achieving balance doesn’t require drastic measures — it’s about making sustainable, thoughtful choices that prioritize health. A balanced diet isn’t just about food; it’s about nourishing your body and mind for a vibrant, energized life.',
-        '2024-11-21 18:31:35.42877');
+        '2024-11-21 18:31:35.42877', NULL),
+    (2, 'The Rise of Electric Vehicles', 
+        'Electric vehicles (EVs) are becoming a global trend, with innovations in battery technology and charging infrastructure leading the way.', 
+        'The year 2024 has seen a surge in electric vehicle adoption, with new models from Tesla, Rivian, and traditional automakers like Ford and GM setting sales records. Innovations in solid-state batteries promise increased range and reduced charging times, while governments worldwide are investing in charging infrastructure to make EVs more accessible.', 
+        NOW(), NULL),
+    (3, 'Breakthroughs in Renewable Energy', 
+        'Renewable energy sources are transforming the global power landscape, with wind and solar leading the charge.', 
+        'Advancements in solar panel efficiency and offshore wind technology are making renewable energy more cost-effective than ever. Countries like China, Germany, and the United States are leading the way in renewable energy capacity expansion, setting ambitious goals for carbon neutrality by 2050.', 
+        NOW(), NULL),
+    (4, 'The Future of Space Exploration', 
+        'Space agencies and private companies are working together to make space exploration more ambitious and inclusive.', 
+        'NASA’s Artemis missions aim to establish a permanent presence on the Moon, while SpaceX’s Starship is preparing for Mars colonization. Emerging players like India and the UAE are also making significant strides, launching groundbreaking missions that expand our understanding of the cosmos.', 
+        NOW(), NULL),
+    (5, 'AI Transforming Healthcare', 
+        'Artificial intelligence is revolutionizing the healthcare industry by enhancing diagnostics and streamlining patient care.', 
+        'AI-powered tools are helping doctors diagnose diseases earlier and more accurately. Machine learning algorithms analyze complex datasets to identify trends in patient health, while telemedicine platforms powered by AI are expanding access to healthcare services globally.', 
+        NOW(), NULL),
+    (2, 'The Impact of Climate Change', 
+        'Climate change continues to be a pressing global issue, requiring urgent action from governments and individuals.', 
+        'Extreme weather events are becoming more frequent due to climate change, affecting millions of lives and causing billions in damages. Efforts to combat climate change include renewable energy adoption, reforestation, and international cooperation on carbon emissions reduction.', 
+        NOW(), NULL),
+    (3, 'Streaming Wars Intensify', 
+        'The competition between streaming platforms like Netflix, Disney+, and Amazon Prime is reshaping the entertainment industry.', 
+        'With new entrants like Max and Peacock, streaming platforms are battling for market share by producing high-budget original content. This competition is driving innovation but also causing fragmentation as viewers subscribe to multiple services.', 
+        NOW(), NULL),
+    (4, 'Breakthrough Vaccines on the Horizon', 
+        'New vaccines targeting various diseases are in development, promising to improve global health outcomes.', 
+        'Researchers are making strides in mRNA technology, developing vaccines for diseases like HIV, malaria, and cancer. These advancements could revolutionize preventative medicine and save millions of lives.', 
+        NOW(), NULL),
+    (5, 'The Rise of Sustainable Fashion', 
+        'Sustainable fashion is gaining traction as consumers become more environmentally conscious.', 
+        'Brands are adopting eco-friendly practices, using recycled materials, and promoting slow fashion. Initiatives like thrift shopping and upcycling are also helping reduce the environmental impact of the fashion industry.', 
+        NOW(), NULL),
+    (2, 'Cryptocurrency Regulation Looms', 
+        'Governments worldwide are grappling with how to regulate the fast-evolving cryptocurrency market.', 
+        'As cryptocurrencies like Bitcoin and Ethereum gain mainstream acceptance, regulatory frameworks are being developed to ensure security and prevent misuse. These regulations will play a crucial role in shaping the future of digital assets.', 
+        NOW(), NULL),
+    (3, 'Mental Health Awareness on the Rise', 
+        'Awareness of mental health issues is increasing, leading to better resources and reduced stigma.', 
+        'Campaigns promoting mental health awareness are encouraging people to seek help. Employers and governments are investing in mental health programs, recognizing their importance in overall well-being and productivity.', 
+        NOW(), NULL);
 
 INSERT INTO post_categories (post_id, category_id) VALUES 
     (1, 1),
     (2, 2),
-    (3, 3);
+    (3, 3),
+    (4, 1),
+    (5, 1),
+    (6, 2),
+    (7, 3),
+    (8, 1),
+    (9, 4),
+    (10, 3),
+    (11, 4),
+    (12, 1),
+    (13, 3);
 
 INSERT INTO comments (post_id, user_id, body, created_at) VALUES 
     (1, 4, 'Great article on AI advancements!', '2024-11-21 19:31:35.42877'),

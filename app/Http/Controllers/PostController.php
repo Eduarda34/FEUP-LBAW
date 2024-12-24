@@ -93,6 +93,7 @@ class PostController extends Controller
                 break;
             case 'custom':
                 $posts = $this->getCustomPosts();
+                $posts = $posts->unique('post_id');
                 break;
             case 'recent':
             default:

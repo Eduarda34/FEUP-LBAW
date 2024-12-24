@@ -21,6 +21,9 @@ docker rm lbaw2484
 docker run -d --name lbaw2484 -p 8001:80 gitlab.up.pt:5050/lbaw/lbaw2425/lbaw2484
 ```
 
+## Admin credentials
+* email: **admin@lbaw2484.com**
+* password: **12345678**
 
 ## User credentials
 * email: **cristiano_cr7_ronaldo@goat.pt**

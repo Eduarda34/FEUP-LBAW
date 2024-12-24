@@ -59,7 +59,7 @@
                     id="bio" 
                     name="bio" 
                     rows="5"  
-                    maxlength="300" 
+                    maxlength="1000" 
                     placeholder="Enter the bio to show in your profile (optional)"
                 >{{ old('bio', $user->bio) }}</textarea>
                 @error('bio')
@@ -74,7 +74,7 @@
         </form>
 
         <!-- Delete Account Button -->
-        <form action="/account/delete" method="POST" class="delete-account-form">
+        <form action="{{ url('/api/users/'.$user->id)}}" method="POST" class="delete-account-form">
             @csrf
             @method('DELETE')
 

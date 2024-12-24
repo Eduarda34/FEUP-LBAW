@@ -74,20 +74,19 @@ Route::controller(UserController::class)->group(function () {
     Route::delete('api/users/notifications/{notification_id}', 'deleteNotification');
     Route::put('api/users/notifications', 'viewAllNotifications');
     Route::delete('api/users/notifications', 'deleteAllNotifications');
-    Route::delete('/account/delete', [UserController::class, 'deleteAccount'])->middleware('auth');
 });
 
 // Posts
 Route::controller(PostController::class)->group(function () {
     Route::get('/posts', 'list')->name('posts');
-    Route::get('/posts/create', [PostController::class, 'showPostCreatorForm'])->name('posts.create');
+    Route::get('/posts/create', 'showPostCreatorForm')->name('posts.create');
     Route::get('/posts/favorites', 'favorites')->name('posts.favorites');
     Route::get('/posts/category/{category_id}', 'listByCategory')->name('posts.category');
     Route::get('/posts/{post_id}', 'show')->name('posts.show');
     Route::get('/posts/{post_id}/edit', 'showPostEditorForm')->name('posts.edit');
     Route::get('/posts/{post_id}/report', 'showReportForm')->name('posts.report');
     // API
-    Route::post('/api/posts', [PostController::class, 'create'])->name('posts.store');
+    Route::post('/api/posts', 'create')->name('posts.store');
     Route::put('/api/posts/{post_id}', 'update')->name('posts.update');
     Route::delete('/api/posts/{post_id}', 'delete')->name('posts.delete');
     Route::post('/api/posts/{post_id}/vote', 'vote')->name('posts.vote');
@@ -96,7 +95,6 @@ Route::controller(PostController::class)->group(function () {
     Route::post('/api/posts/{post_id}/favorites', 'addToFavorites')->name('posts.favorites.add');
     Route::delete('/api/posts/{post_id}/favorites', 'removeFromFavorites')->name('posts.favorites.remove');
     Route::post('api/posts/{post_id}/report', 'report');
-    Route::delete('/comments/{comment}', 'CommentController@delete')->name('sys.comments.delete');
     // System Manager
     Route::delete('/sys/posts/{post_id}', 'forceDelete')->name('sys.postDelete');
 });

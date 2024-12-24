@@ -53,7 +53,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->id == $model->id;
+        return $user->id == $model->id || $user->system_managers;
     }
 
     /**

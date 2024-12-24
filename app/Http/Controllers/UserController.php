@@ -130,7 +130,7 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|max:50|unique:users,username,' . $user->id,
             'email' => 'required|email|max:250|unique:users,email,' . $user->id,
-            'bio' => 'nullable|string|max:300',
+            'bio' => 'nullable|string|max:1000',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
@@ -152,7 +152,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(int $id)
+    public function delete(Request $request, int $id)
     {
         if (!Auth::check()) {
             // Not logged in, redirect to login.
@@ -169,9 +169,17 @@ class UserController extends Controller
         // Check if the current user is authorized to delete this user.
         $this->authorize('delete', $user);
 
+        if (!Auth::user()->system_managers) {
+            $request->validate(['password' => 'required',]);
+
+            if (!Hash::check($request->password, $user->password)) {
+                return redirect()->back()->withErrors(['password' => 'Password is incorrect.']);
+            }
+        }
+
         // Delete the user and return it as JSON.
         $user->delete();
-        return response()->json($user);
+        return redirect('/')->with('success', 'Your account has been deleted successfully.');
     }
 
     /**
